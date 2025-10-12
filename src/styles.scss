@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Variables globales */
+:root {
+  --color-primary: #0066CC;
+  --color-secondary: #00CC99;
+  --color-accent: #FF6B6B;
+  --color-background: #F8F9FA;
+  --color-text: #212529;
+}
+
+/* Estilos base */
+body {
+  @apply bg-background text-text;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Utilidades personalizadas */
+.btn-primary {
+  @apply bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200;
+}
+
+.btn-secondary {
+  @apply bg-secondary-500 hover:bg-secondary-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200;
+}
+
+.card {
+  @apply bg-white rounded-lg shadow-md p-6;
+}
