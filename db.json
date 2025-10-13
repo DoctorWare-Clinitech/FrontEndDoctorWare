@@ -1,0 +1,124 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "email": "doctor@test.com",
+      "password": "123456",
+      "name": "Dr. Juan Pérez",
+      "role": "professional",
+      "status": "active",
+      "specialization": "Medicina General",
+      "licenseNumber": "MN-12345",
+      "consultationDuration": 30,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "email": "secretaria@test.com",
+      "password": "123456",
+      "name": "María González",
+      "role": "secretary",
+      "status": "active",
+      "professionalId": "1",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "email": "paciente@test.com",
+      "password": "123456",
+      "name": "Carlos Rodríguez",
+      "role": "patient",
+      "status": "active",
+      "dateOfBirth": "1990-05-15",
+      "dni": "12345678",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "4",
+      "email": "admin@test.com",
+      "password": "123456",
+      "name": "Admin Sistema",
+      "role": "admin",
+      "status": "active",
+      "permissions": [
+        "all"
+      ],
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "appointments": [
+    {
+      "id": "1",
+      "patientId": "3",
+      "patientName": "Carlos Rodríguez",
+      "professionalId": "1",
+      "professionalName": "Dr. Juan Pérez",
+      "date": "2024-10-15T00:00:00.000Z",
+      "startTime": "10:00",
+      "endTime": "10:30",
+      "duration": 30,
+      "status": "scheduled",
+      "type": "first_visit",
+      "reason": "Consulta general",
+      "createdBy": "2",
+      "createdAt": "2024-10-12T00:00:00.000Z",
+      "updatedAt": "2024-10-12T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "createdAt": "2025-10-13T04:15:23.849Z",
+      "updatedAt": "2025-10-13T04:15:23.849Z"
+    },
+    {
+      "id": "3",
+      "patientId": "3",
+      "professionalId": "1",
+      "date": "2024-10-20T00:00:00.000Z",
+      "startTime": "15:00",
+      "endTime": "15:30",
+      "status": "scheduled",
+      "reason": "Chequeo general",
+      "createdAt": "2025-10-13T04:16:01.264Z",
+      "updatedAt": "2025-10-13T04:16:01.264Z"
+    }
+  ],
+  "patients": [
+    {
+      "id": "1",
+      "userId": "3",
+      "name": "Carlos Rodríguez",
+      "email": "paciente@test.com",
+      "phone": "+54 9 11 1234-5678",
+      "dni": "12345678",
+      "dateOfBirth": "1990-05-15",
+      "age": 34,
+      "gender": "male",
+      "address": {
+        "street": "Av. Corrientes 1234",
+        "city": "Buenos Aires",
+        "state": "CABA",
+        "zipCode": "C1043",
+        "country": "Argentina"
+      },
+      "emergencyContact": {
+        "name": "Ana Rodríguez",
+        "phone": "+54 9 11 9876-5432",
+        "relationship": "Esposa"
+      },
+      "medicalInfo": {
+        "allergies": [],
+        "chronicConditions": [],
+        "currentMedications": [],
+        "surgeries": []
+      },
+      "professionalId": "1",
+      "isActive": true,
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ]
+}
