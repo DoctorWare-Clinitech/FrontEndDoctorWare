@@ -1,0 +1,74 @@
+.auth-form {
+  max-width: 100%;
+
+  // Inputs con estilos consistentes
+  input:not([type="checkbox"]):not([type="radio"]) {
+    transition: all 0.2s ease-in-out;
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+    }
+
+    &.border-red-500 {
+      animation: shake 0.3s ease-in-out;
+    }
+  }
+
+  // Botones
+  button[type="submit"] {
+    transition: all 0.2s ease-in-out;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 102, 204, 0.2);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+  }
+
+  // Links
+  a {
+    transition: color 0.2s ease-in-out;
+  }
+
+  // Mensajes de error/éxito con animación
+  .bg-red-50, .bg-green-50 {
+    animation: slideDown 0.3s ease-out;
+  }
+}
+
+// Animación de shake para errores
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+// Animación de slide down
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Loading spinner
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
