@@ -14,60 +14,33 @@ import { routes } from './app.routes';
 import { jwtInterceptor, errorInterceptor } from './core/interceptors';
 import { environment } from '../environments/environment';
 
-/**
- * Función para obtener el token del localStorage
- */
 export function tokenGetter(): string | null {
+  if (typeof window === 'undefined') return null;
   return localStorage.getItem(environment.jwtStorageKey);
 }
 
-/**
- * Configuración principal de la aplicación
- * 
- * Incluye:
- * - SSR/SSG (Client Hydration con Event Replay)
- * - Detección de cambios optimizada
- * - HTTP Client con interceptores JWT y manejo de errores
- * - JWT Module con configuración de tokens
- * - Animaciones
- */
 export const appConfig: ApplicationConfig = {
   providers: [
-    // Listeners globales de errores del navegador
     provideBrowserGlobalErrorListeners(),
-
-    // Detección de cambios optimizada
     provideZoneChangeDetection({ eventCoalescing: true }),
-
-    // Router con rutas lazy-loaded
     provideRouter(routes),
-
-    // Client Hydration para SSR/SSG con replay de eventos
     provideClientHydration(withEventReplay()),
-
-    // HTTP Client con interceptores y soporte Fetch API
     provideHttpClient(
-      withFetch(), // Usa Fetch API en lugar de XMLHttpRequest (mejor para SSR)
+      withFetch(),
       withInterceptors([
-        jwtInterceptor,      // Agrega JWT a las peticiones
-        errorInterceptor     // Manejo global de errores HTTP
+        jwtInterceptor,
+        errorInterceptor
       ])
     ),
-
-    // Animaciones de Angular Material
     provideAnimations(),
-
-    // JWT Module - Configuración de autenticación
     importProvidersFrom(
       JwtModule.forRoot({
         config: {
           tokenGetter,
-          // Dominios permitidos para enviar el token
           allowedDomains: [
             'localhost:3000',
             'api.doctorware.com'
           ],
-          // Rutas que NO deben incluir el token
           disallowedRoutes: [
             'localhost:3000/api/auth/login',
             'localhost:3000/api/auth/register',
@@ -75,7 +48,9 @@ export const appConfig: ApplicationConfig = {
             'api.doctorware.com/api/auth/login',
             'api.doctorware.com/api/auth/register',
             'api.doctorware.com/api/auth/forgot-password'
-          ]
+          ],
+          // NO configurar secretKey aquí, solo el backend lo necesita
+          skipWhenExpired: false
         }
       })
     )
