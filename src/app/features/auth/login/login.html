@@ -2,13 +2,15 @@
   <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Iniciar Sesión</h2>
 
   <!-- Mensaje de error -->
-  <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-    {{ errorMessage }}
-  </div>
+  @if (errorMessage) {
+    <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+      {{ errorMessage }}
+    </div>
+  }
 
   <!-- Formulario -->
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    
+
     <!-- Email -->
     <div class="mb-4">
       <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
@@ -21,118 +23,136 @@
         class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
         [class.border-red-500]="email?.invalid && email?.touched"
         placeholder="tu@email.com"
-      />
-      <div *ngIf="email?.invalid && email?.touched" class="mt-1 text-sm text-red-600">
-        <span *ngIf="email?.errors?.['required']">El email es requerido</span>
-        <span *ngIf="email?.errors?.['email']">Email inválido</span>
-      </div>
-    </div>
-
-    <!-- Password -->
-    <div class="mb-4">
-      <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
-        Contraseña
-      </label>
-      <div class="relative">
-        <input
-          id="password"
-          [type]="showPassword ? 'text' : 'password'"
-          formControlName="password"
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent pr-10"
-          [class.border-red-500]="password?.invalid && password?.touched"
-          placeholder="••••••••"
         />
-        <button
-          type="button"
-          (click)="togglePasswordVisibility()"
-          class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-        >
-          <svg *ngIf="!showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-          </svg>
-          <svg *ngIf="showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-          </svg>
-        </button>
+        @if (email?.invalid && email?.touched) {
+          <div class="mt-1 text-sm text-red-600">
+            @if (email?.errors?.['required']) {
+              <span>El email es requerido</span>
+            }
+            @if (email?.errors?.['email']) {
+              <span>Email inválido</span>
+            }
+          </div>
+        }
       </div>
-      <div *ngIf="password?.invalid && password?.touched" class="mt-1 text-sm text-red-600">
-        <span *ngIf="password?.errors?.['required']">La contraseña es requerida</span>
-        <span *ngIf="password?.errors?.['minlength']">Mínimo 6 caracteres</span>
+
+      <!-- Password -->
+      <div class="mb-4">
+        <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+          Contraseña
+        </label>
+        <div class="relative">
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent pr-10"
+            [class.border-red-500]="password?.invalid && password?.touched"
+            placeholder="••••••••"
+            />
+            <button
+              type="button"
+              (click)="togglePasswordVisibility()"
+              class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+              @if (!showPassword) {
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              }
+              @if (showPassword) {
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                </svg>
+              }
+            </button>
+          </div>
+          @if (password?.invalid && password?.touched) {
+            <div class="mt-1 text-sm text-red-600">
+              @if (password?.errors?.['required']) {
+                <span>La contraseña es requerida</span>
+              }
+              @if (password?.errors?.['minlength']) {
+                <span>Mínimo 6 caracteres</span>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Remember Me & Forgot Password -->
+        <div class="flex items-center justify-between mb-6">
+          <label class="flex items-center">
+            <input
+              type="checkbox"
+              formControlName="rememberMe"
+              class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+              />
+              <span class="ml-2 text-sm text-gray-600">Recordarme</span>
+            </label>
+            <a routerLink="/auth/forgot-password" class="text-sm text-primary-600 hover:text-primary-700">
+              ¿Olvidaste tu contraseña?
+            </a>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            [disabled]="isLoading"
+            class="w-full btn-primary flex items-center justify-center"
+            [class.opacity-50]="isLoading"
+            [class.cursor-not-allowed]="isLoading"
+            >
+            @if (isLoading) {
+              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            }
+            {{ isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
+          </button>
+        </form>
+
+        <!-- Register Link -->
+        <div class="mt-6 text-center text-sm text-gray-600">
+          ¿No tienes una cuenta?
+          <a routerLink="/auth/register" class="text-primary-600 hover:text-primary-700 font-medium">
+            Regístrate aquí
+          </a>
+        </div>
+
+        <!-- Credenciales de prueba (solo desarrollo) -->
+        <div class="mt-6 pt-6 border-t border-gray-200">
+          <p class="text-xs text-gray-500 text-center mb-3">Credenciales de prueba:</p>
+          <div class="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              (click)="fillTestCredentials('professional')"
+              class="text-xs px-3 py-2 bg-blue-50 text-blue-700 rounded hover:bg-blue-100"
+              >
+              👨‍⚕️ Profesional
+            </button>
+            <button
+              type="button"
+              (click)="fillTestCredentials('secretary')"
+              class="text-xs px-3 py-2 bg-green-50 text-green-700 rounded hover:bg-green-100"
+              >
+              📋 Secretaria
+            </button>
+            <button
+              type="button"
+              (click)="fillTestCredentials('patient')"
+              class="text-xs px-3 py-2 bg-purple-50 text-purple-700 rounded hover:bg-purple-100"
+              >
+              👤 Paciente
+            </button>
+            <button
+              type="button"
+              (click)="fillTestCredentials('admin')"
+              class="text-xs px-3 py-2 bg-red-50 text-red-700 rounded hover:bg-red-100"
+              >
+              ⚙️ Admin
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
-
-    <!-- Remember Me & Forgot Password -->
-    <div class="flex items-center justify-between mb-6">
-      <label class="flex items-center">
-        <input
-          type="checkbox"
-          formControlName="rememberMe"
-          class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
-        />
-        <span class="ml-2 text-sm text-gray-600">Recordarme</span>
-      </label>
-      <a routerLink="/auth/forgot-password" class="text-sm text-primary-600 hover:text-primary-700">
-        ¿Olvidaste tu contraseña?
-      </a>
-    </div>
-
-    <!-- Submit Button -->
-    <button
-      type="submit"
-      [disabled]="isLoading"
-      class="w-full btn-primary flex items-center justify-center"
-      [class.opacity-50]="isLoading"
-      [class.cursor-not-allowed]="isLoading"
-    >
-      <svg *ngIf="isLoading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
-      {{ isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
-    </button>
-  </form>
-
-  <!-- Register Link -->
-  <div class="mt-6 text-center text-sm text-gray-600">
-    ¿No tienes una cuenta?
-    <a routerLink="/auth/register" class="text-primary-600 hover:text-primary-700 font-medium">
-      Regístrate aquí
-    </a>
-  </div>
-
-  <!-- Credenciales de prueba (solo desarrollo) -->
-  <div class="mt-6 pt-6 border-t border-gray-200">
-    <p class="text-xs text-gray-500 text-center mb-3">Credenciales de prueba:</p>
-    <div class="grid grid-cols-2 gap-2">
-      <button
-        type="button"
-        (click)="fillTestCredentials('professional')"
-        class="text-xs px-3 py-2 bg-blue-50 text-blue-700 rounded hover:bg-blue-100"
-      >
-        👨‍⚕️ Profesional
-      </button>
-      <button
-        type="button"
-        (click)="fillTestCredentials('secretary')"
-        class="text-xs px-3 py-2 bg-green-50 text-green-700 rounded hover:bg-green-100"
-      >
-        📋 Secretaria
-      </button>
-      <button
-        type="button"
-        (click)="fillTestCredentials('patient')"
-        class="text-xs px-3 py-2 bg-purple-50 text-purple-700 rounded hover:bg-purple-100"
-      >
-        👤 Paciente
-      </button>
-      <button
-        type="button"
-        (click)="fillTestCredentials('admin')"
-        class="text-xs px-3 py-2 bg-red-50 text-red-700 rounded hover:bg-red-100"
-      >
-        ⚙️ Admin
-      </button>
-    </div>
-  </div>
-</div>
