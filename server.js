@@ -1,9 +1,29 @@
-// server.js - Mock API Server con autenticación
+// server.js
 
 const jsonServer = require('json-server');
+const jwt = require('jsonwebtoken');
 const server = jsonServer.create();
 const router = jsonServer.router('db.json');
 const middlewares = jsonServer.defaults();
+
+// Secret para firmar tokens (en producción debe ser una variable de entorno)
+const JWT_SECRET = 'doctorware-secret-key-2024';
+const JWT_EXPIRES_IN = '1h';
+
+// Función para generar JWT
+function generateToken(user) {
+  return jwt.sign(
+    {
+      sub: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      iat: Math.floor(Date.now() / 1000)
+    },
+    JWT_SECRET,
+    { expiresIn: JWT_EXPIRES_IN }
+  );
+}
 
 // Habilitar CORS
 server.use((req, res, next) => {
@@ -16,17 +36,12 @@ server.use((req, res, next) => {
 server.use(middlewares);
 server.use(jsonServer.bodyParser);
 
-// ==============================================
-// RUTAS DE AUTENTICACIÓN CUSTOM
-// ==============================================
-
 // POST /api/auth/login
 server.post('/api/auth/login', (req, res) => {
   const { email, password } = req.body;
   
   console.log('🔐 Login attempt:', { email });
 
-  // Buscar usuario en la base de datos
   const db = router.db;
   const user = db.get('users').find({ email }).value();
 
@@ -44,14 +59,14 @@ server.post('/api/auth/login', (req, res) => {
     });
   }
 
-  // Generar token mock (en producción usarías JWT real)
-  const token = `mock-jwt-token-${user.id}-${Date.now()}`;
-  const refreshToken = `mock-refresh-token-${user.id}-${Date.now()}`;
+  // Generar tokens JWT válidos
+  const token = generateToken(user);
+  const refreshToken = generateToken({ ...user, type: 'refresh' });
 
-  // Remover password de la respuesta
   const { password: _, ...userWithoutPassword } = user;
 
   console.log('✅ Login successful:', user.email);
+  console.log('🎫 Token generated');
 
   res.status(200).json({
     token,
@@ -68,8 +83,6 @@ server.post('/api/auth/register', (req, res) => {
   console.log('📝 Register attempt:', { email, role });
 
   const db = router.db;
-  
-  // Verificar si el email ya existe
   const existingUser = db.get('users').find({ email }).value();
   
   if (existingUser) {
@@ -79,7 +92,6 @@ server.post('/api/auth/register', (req, res) => {
     });
   }
 
-  // Crear nuevo usuario
   const newUser = {
     id: String(Date.now()),
     email,
@@ -93,12 +105,10 @@ server.post('/api/auth/register', (req, res) => {
     updatedAt: new Date().toISOString()
   };
 
-  // Guardar en la base de datos
   db.get('users').push(newUser).write();
 
-  // Generar tokens
-  const token = `mock-jwt-token-${newUser.id}-${Date.now()}`;
-  const refreshToken = `mock-refresh-token-${newUser.id}-${Date.now()}`;
+  const token = generateToken(newUser);
+  const refreshToken = generateToken({ ...newUser, type: 'refresh' });
 
   const { password: _, ...userWithoutPassword } = newUser;
 
@@ -124,30 +134,36 @@ server.post('/api/auth/refresh', (req, res) => {
     });
   }
 
-  // Extraer user ID del refresh token mock
-  const userId = refreshToken.split('-')[3];
-  const db = router.db;
-  const user = db.get('users').find({ id: userId }).value();
+  try {
+    const decoded = jwt.verify(refreshToken, JWT_SECRET);
+    const db = router.db;
+    const user = db.get('users').find({ id: decoded.sub }).value();
 
-  if (!user) {
+    if (!user) {
+      return res.status(401).json({ 
+        message: 'Token inválido' 
+      });
+    }
+
+    const newToken = generateToken(user);
+    const newRefreshToken = generateToken({ ...user, type: 'refresh' });
+
+    const { password: _, ...userWithoutPassword } = user;
+
+    console.log('✅ Token refreshed for:', user.email);
+
+    res.status(200).json({
+      token: newToken,
+      refreshToken: newRefreshToken,
+      user: userWithoutPassword,
+      expiresIn: 3600
+    });
+  } catch (error) {
+    console.error('❌ Refresh token error:', error);
     return res.status(401).json({ 
-      message: 'Token inválido' 
+      message: 'Token inválido o expirado' 
     });
   }
-
-  const newToken = `mock-jwt-token-${user.id}-${Date.now()}`;
-  const newRefreshToken = `mock-refresh-token-${user.id}-${Date.now()}`;
-
-  const { password: _, ...userWithoutPassword } = user;
-
-  console.log('✅ Token refreshed for:', user.email);
-
-  res.status(200).json({
-    token: newToken,
-    refreshToken: newRefreshToken,
-    user: userWithoutPassword,
-    expiresIn: 3600
-  });
 });
 
 // GET /api/auth/me
@@ -160,22 +176,28 @@ server.get('/api/auth/me', (req, res) => {
     });
   }
 
-  // Extraer user ID del token mock
-  const token = authHeader.replace('Bearer ', '');
-  const userId = token.split('-')[3];
+  try {
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = jwt.verify(token, JWT_SECRET);
 
-  const db = router.db;
-  const user = db.get('users').find({ id: userId }).value();
+    const db = router.db;
+    const user = db.get('users').find({ id: decoded.sub }).value();
 
-  if (!user) {
+    if (!user) {
+      return res.status(401).json({ 
+        message: 'Usuario no encontrado' 
+      });
+    }
+
+    const { password: _, ...userWithoutPassword } = user;
+
+    res.status(200).json(userWithoutPassword);
+  } catch (error) {
+    console.error('❌ Auth error:', error);
     return res.status(401).json({ 
       message: 'Token inválido' 
     });
   }
-
-  const { password: _, ...userWithoutPassword } = user;
-
-  res.status(200).json(userWithoutPassword);
 });
 
 // POST /api/auth/forgot-password
@@ -184,14 +206,6 @@ server.post('/api/auth/forgot-password', (req, res) => {
 
   console.log('🔑 Password reset requested for:', email);
 
-  const db = router.db;
-  const user = db.get('users').find({ email }).value();
-
-  if (!user) {
-    // Por seguridad, responder siempre lo mismo
-    console.log('⚠️ Email not found, but responding success');
-  }
-
   res.status(200).json({
     message: `Se ha enviado un correo de recuperación a ${email}`
   });
@@ -199,19 +213,12 @@ server.post('/api/auth/forgot-password', (req, res) => {
 
 // POST /api/auth/reset-password
 server.post('/api/auth/reset-password', (req, res) => {
-  const { token, newPassword } = req.body;
+  console.log('🔐 Password reset attempt');
 
-  console.log('🔐 Password reset attempt with token');
-
-  // En un sistema real, verificarías el token
   res.status(200).json({
     message: 'Contraseña actualizada correctamente'
   });
 });
-
-// ==============================================
-// USAR ROUTER POR DEFECTO PARA OTRAS RUTAS
-// ==============================================
 
 // Reescribir rutas para agregar /api prefix
 server.use(jsonServer.rewriter({
@@ -219,10 +226,6 @@ server.use(jsonServer.rewriter({
 }));
 
 server.use(router);
-
-// ==============================================
-// INICIAR SERVIDOR
-// ==============================================
 
 const PORT = 3000;
 server.listen(PORT, () => {
@@ -237,14 +240,13 @@ server.listen(PORT, () => {
   console.log('   GET    /api/auth/me');
   console.log('   POST   /api/auth/forgot-password');
   console.log('   POST   /api/auth/reset-password');
-  console.log('   GET    /api/users');
-  console.log('   GET    /api/appointments');
-  console.log('   GET    /api/patients');
   console.log('');
   console.log('👥 Usuarios de prueba:');
   console.log('   doctor@test.com / 123456 (Profesional)');
   console.log('   secretaria@test.com / 123456 (Secretaria)');
   console.log('   paciente@test.com / 123456 (Paciente)');
   console.log('   admin@test.com / 123456 (Admin)');
+  console.log('');
+  console.log('🔑 JWT Secret:', JWT_SECRET);
   console.log('');
 });
