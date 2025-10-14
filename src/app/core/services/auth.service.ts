@@ -1,5 +1,3 @@
-// src/app/core/services/auth.service.ts
-
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
@@ -23,6 +21,8 @@ export class AuthService {
   private readonly API_URL = environment.apiBaseUrl;
   private readonly TOKEN_KEY = environment.jwtStorageKey;
   private readonly REFRESH_TOKEN_KEY = `${environment.jwtStorageKey}_refresh`;
+  private readonly platformId = inject(PLATFORM_ID);
+  private isBrowser: boolean;
 
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -35,6 +35,7 @@ export class AuthService {
     private router: Router,
     private jwtHelper: JwtHelperService
   ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
     this.initializeAuth();
   }
 
@@ -42,6 +43,8 @@ export class AuthService {
    * Inicializar autenticación al cargar el servicio
    */
   private initializeAuth(): void {
+    if (!this.isBrowser) return;
+    
     const token = this.getToken();
     if (token && !this.jwtHelper.isTokenExpired(token)) {
       this.loadCurrentUser();
@@ -95,6 +98,8 @@ export class AuthService {
    * Verificar si el usuario está autenticado
    */
   isAuthenticated(): boolean {
+    if (!this.isBrowser) return false;
+    
     const token = this.getToken();
     if (!token) {
       return false;
@@ -113,6 +118,7 @@ export class AuthService {
    * Obtener token actual
    */
   getToken(): string | null {
+    if (!this.isBrowser) return null;
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
@@ -120,6 +126,7 @@ export class AuthService {
    * Obtener refresh token
    */
   getRefreshToken(): string | null {
+    if (!this.isBrowser) return null;
     return localStorage.getItem(this.REFRESH_TOKEN_KEY);
   }
 
@@ -207,6 +214,8 @@ export class AuthService {
    * Manejar respuesta de autenticación
    */
   private handleAuthResponse(response: AuthResponse): void {
+    if (!this.isBrowser) return;
+    
     // Guardar tokens
     localStorage.setItem(this.TOKEN_KEY, response.token);
     if (response.refreshToken) {
@@ -225,6 +234,8 @@ export class AuthService {
    * Cargar usuario actual desde el token
    */
   private loadCurrentUser(): void {
+    if (!this.isBrowser) return;
+    
     const token = this.getToken();
     
     if (!token) {
@@ -267,8 +278,10 @@ export class AuthService {
    * Limpiar datos de autenticación
    */
   private clearAuthData(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
-    localStorage.removeItem(this.REFRESH_TOKEN_KEY);
+    if (this.isBrowser) {
+      localStorage.removeItem(this.TOKEN_KEY);
+      localStorage.removeItem(this.REFRESH_TOKEN_KEY);
+    }
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
   }
@@ -292,6 +305,8 @@ export class AuthService {
    * Verificar si el token está por expirar (menos de 5 minutos)
    */
   isTokenExpiringSoon(): boolean {
+    if (!this.isBrowser) return false;
+    
     const token = this.getToken();
     if (!token) {
       return false;
