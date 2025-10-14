@@ -7,11 +7,14 @@
       "name": "Dr. Juan Pérez",
       "role": "professional",
       "status": "active",
+      "avatar": "https://i.pravatar.cc/150?img=12",
+      "phone": "+54 9 11 1234-5678",
       "specialization": "Medicina General",
       "licenseNumber": "MN-12345",
       "consultationDuration": 30,
+      "bio": "Médico especialista en medicina general con 10 años de experiencia",
       "createdAt": "2024-01-01T00:00:00.000Z",
-      "updatedAt": "2024-01-01T00:00:00.000Z"
+      "updatedAt": "2024-10-12T00:00:00.000Z"
     },
     {
       "id": "2",
@@ -20,9 +23,11 @@
       "name": "María González",
       "role": "secretary",
       "status": "active",
+      "avatar": "https://i.pravatar.cc/150?img=47",
+      "phone": "+54 9 11 2345-6789",
       "professionalId": "1",
-      "createdAt": "2024-01-01T00:00:00.000Z",
-      "updatedAt": "2024-01-01T00:00:00.000Z"
+      "createdAt": "2024-01-15T00:00:00.000Z",
+      "updatedAt": "2024-10-12T00:00:00.000Z"
     },
     {
       "id": "3",
@@ -31,10 +36,13 @@
       "name": "Carlos Rodríguez",
       "role": "patient",
       "status": "active",
+      "avatar": "https://i.pravatar.cc/150?img=33",
+      "phone": "+54 9 11 3456-7890",
       "dateOfBirth": "1990-05-15",
       "dni": "12345678",
-      "createdAt": "2024-01-01T00:00:00.000Z",
-      "updatedAt": "2024-01-01T00:00:00.000Z"
+      "address": "Av. Corrientes 1234, CABA",
+      "createdAt": "2024-02-01T00:00:00.000Z",
+      "updatedAt": "2024-10-12T00:00:00.000Z"
     },
     {
       "id": "4",
@@ -43,11 +51,11 @@
       "name": "Admin Sistema",
       "role": "admin",
       "status": "active",
-      "permissions": [
-        "all"
-      ],
+      "avatar": "https://i.pravatar.cc/150?img=68",
+      "phone": "+54 9 11 4567-8901",
+      "permissions": ["users:read", "users:write", "users:delete", "reports:read", "settings:write"],
       "createdAt": "2024-01-01T00:00:00.000Z",
-      "updatedAt": "2024-01-01T00:00:00.000Z"
+      "updatedAt": "2024-10-12T00:00:00.000Z"
     }
   ],
   "appointments": [
@@ -64,26 +72,27 @@
       "status": "scheduled",
       "type": "first_visit",
       "reason": "Consulta general",
+      "notes": "Primera consulta del paciente",
       "createdBy": "2",
       "createdAt": "2024-10-12T00:00:00.000Z",
       "updatedAt": "2024-10-12T00:00:00.000Z"
     },
     {
       "id": "2",
-      "createdAt": "2025-10-13T04:15:23.849Z",
-      "updatedAt": "2025-10-13T04:15:23.849Z"
-    },
-    {
-      "id": "3",
       "patientId": "3",
+      "patientName": "Carlos Rodríguez",
       "professionalId": "1",
+      "professionalName": "Dr. Juan Pérez",
       "date": "2024-10-20T00:00:00.000Z",
-      "startTime": "15:00",
-      "endTime": "15:30",
-      "status": "scheduled",
-      "reason": "Chequeo general",
-      "createdAt": "2025-10-13T04:16:01.264Z",
-      "updatedAt": "2025-10-13T04:16:01.264Z"
+      "startTime": "14:00",
+      "endTime": "14:30",
+      "duration": 30,
+      "status": "confirmed",
+      "type": "follow_up",
+      "reason": "Control mensual",
+      "createdBy": "3",
+      "createdAt": "2024-10-13T00:00:00.000Z",
+      "updatedAt": "2024-10-13T00:00:00.000Z"
     }
   ],
   "patients": [
@@ -92,7 +101,7 @@
       "userId": "3",
       "name": "Carlos Rodríguez",
       "email": "paciente@test.com",
-      "phone": "+54 9 11 1234-5678",
+      "phone": "+54 9 11 3456-7890",
       "dni": "12345678",
       "dateOfBirth": "1990-05-15",
       "age": 34,
@@ -107,18 +116,52 @@
       "emergencyContact": {
         "name": "Ana Rodríguez",
         "phone": "+54 9 11 9876-5432",
-        "relationship": "Esposa"
+        "relationship": "Esposa",
+        "email": "ana@email.com"
+      },
+      "medicalInsurance": {
+        "provider": "OSDE",
+        "planName": "310",
+        "memberNumber": "123456789",
+        "validUntil": "2025-12-31"
       },
       "medicalInfo": {
-        "allergies": [],
+        "bloodType": "O+",
+        "allergies": ["Penicilina"],
         "chronicConditions": [],
         "currentMedications": [],
         "surgeries": []
       },
       "professionalId": "1",
       "isActive": true,
-      "createdAt": "2024-01-01T00:00:00.000Z",
-      "updatedAt": "2024-01-01T00:00:00.000Z"
+      "createdAt": "2024-02-01T00:00:00.000Z",
+      "updatedAt": "2024-10-12T00:00:00.000Z"
+    }
+  ],
+  "medicalHistory": [
+    {
+      "id": "1",
+      "patientId": "1",
+      "professionalId": "1",
+      "professionalName": "Dr. Juan Pérez",
+      "appointmentId": "1",
+      "date": "2024-10-15T10:00:00.000Z",
+      "diagnosis": "Resfriado común",
+      "symptoms": ["Tos", "Congestión nasal", "Dolor de garganta"],
+      "treatment": "Reposo, hidratación abundante",
+      "prescriptions": [
+        {
+          "medication": "Ibuprofeno 400mg",
+          "dosage": "400mg",
+          "frequency": "Cada 8 horas",
+          "duration": "5 días",
+          "instructions": "Tomar con alimentos"
+        }
+      ],
+      "followUp": "Control en 7 días si los síntomas persisten",
+      "notes": "Paciente presenta cuadro viral típico",
+      "createdAt": "2024-10-15T10:30:00.000Z",
+      "updatedAt": "2024-10-15T10:30:00.000Z"
     }
   ]
 }

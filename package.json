@@ -4,8 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "mock-api": "node ./mock/server.js",
-    "dev": "concurrently \"pnpm run mock-api\" \"pnpm start\"",
+    "mock-api": "node server.js",
+    "dev": "concurrently \"pnpm mock-api\" \"pnpm start\" --names \"API,APP\" --prefix-colors \"cyan,magenta\"",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
