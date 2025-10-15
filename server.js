@@ -220,6 +220,65 @@ server.post('/api/auth/reset-password', (req, res) => {
   });
 });
 
+// GET /api/appointments
+server.get('/api/appointments', (req, res) => {
+  console.log('📋 Get appointments');
+  
+  const db = router.db;
+  let appointments = db.get('appointments').value();
+
+  // Filtrar por professionalId si se proporciona
+  if (req.query.professionalId) {
+    appointments = appointments.filter(a => a.professionalId === req.query.professionalId);
+  }
+
+  // Filtrar por fecha si se proporciona
+  if (req.query.startDate) {
+    const startDate = new Date(req.query.startDate);
+    appointments = appointments.filter(a => new Date(a.date) >= startDate);
+  }
+
+  if (req.query.endDate) {
+    const endDate = new Date(req.query.endDate);
+    appointments = appointments.filter(a => new Date(a.date) <= endDate);
+  }
+
+  console.log(`✅ Returning ${appointments.length} appointments`);
+  res.json(appointments);
+});
+
+// PUT /api/appointments/:id
+server.put('/api/appointments/:id', (req, res) => {
+  const { id } = req.params;
+  const updates = req.body;
+  
+  console.log('✏️ Update appointment:', id);
+
+  const db = router.db;
+  const appointment = db.get('appointments').find({ id }).value();
+
+  if (!appointment) {
+    return res.status(404).json({ message: 'Turno no encontrado' });
+  }
+
+  const updated = { ...appointment, ...updates, updatedAt: new Date().toISOString() };
+  db.get('appointments').find({ id }).assign(updated).write();
+
+  console.log('✅ Appointment updated');
+  res.json(updated);
+});
+
+// GET /api/patients
+server.get('/api/patients', (req, res) => {
+  console.log('👥 Get patients');
+  
+  const db = router.db;
+  const patients = db.get('patients').value();
+
+  console.log(`✅ Returning ${patients.length} patients`);
+  res.json(patients);
+});
+
 // Reescribir rutas para agregar /api prefix
 server.use(jsonServer.rewriter({
   '/api/*': '/$1'
