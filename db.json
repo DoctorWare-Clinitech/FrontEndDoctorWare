@@ -93,6 +93,23 @@
       "createdBy": "3",
       "createdAt": "2024-10-13T00:00:00.000Z",
       "updatedAt": "2024-10-13T00:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "patientId": "1",
+      "patientName": "Carlos Rodríguez",
+      "professionalId": "1",
+      "professionalName": "Dr. Juan Pérez",
+      "date": "2025-10-15T00:00:00.000Z",
+      "startTime": "11:00",
+      "endTime": "11:30",
+      "duration": 30,
+      "status": "scheduled",
+      "type": "routine",
+      "reason": "Chequeo de rutina",
+      "createdBy": "2",
+      "createdAt": "2024-10-14T00:00:00.000Z",
+      "updatedAt": "2024-10-14T00:00:00.000Z"
     }
   ],
   "patients": [

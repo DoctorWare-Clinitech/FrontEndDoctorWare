@@ -1,228 +1,299 @@
-import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Table, TableColumn } from '../../../shared/components/table/table';
 import { Modal } from '../../../shared/components/modal/modal';
 import { ToastService } from '../../../shared/services/toast.service';
+import { AppointmentsService } from '../../../core/services/appointments.service';
+import { PatientsService } from '../../../core/services/patients.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { 
   DateFormatPipe, 
   TimeAgoPipe, 
-  CurrencyFormatPipe,
-  DniFormatPipe,
-  PhoneFormatPipe,
-  InitialsPipe
+  InitialsPipe 
 } from '../../../shared/pipes';
+import { Appointment } from '../../../core/models';
+import { toSignal } from '@angular/core/rxjs-interop';
 
-interface Appointment {
-  id: string;
-  patient: string;
-  date: string;
-  time: string;
-  status: string;
-  dni?: string;
-  phone?: string;
-  price?: number;
+interface DashboardStats {
+  todayAppointments: number;
+  totalPatients: number;
+  pendingAppointments: number;
+  completedToday: number;
 }
 
 @Component({
   selector: 'app-dashboard',
   imports: [
-    Table, 
+    Table,
     Modal,
     DateFormatPipe,
     TimeAgoPipe,
-    CurrencyFormatPipe,
-    DniFormatPipe,
-    PhoneFormatPipe,
     InitialsPipe
   ],
-  template: `
-    <div class="space-y-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p class="text-sm text-gray-500 mt-1">
-            {{ today | dateFormat:'EEEE, dd MMMM yyyy' }}
-          </p>
-        </div>
-        <button 
-          type="button"
-          (click)="showModal.set(true)"
-          class="btn-primary"
-        >
-          Nuevo Turno
-        </button>
-      </div>
-
-      <!-- Stats Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="card">
-          <h3 class="text-sm font-medium text-gray-500">Turnos Hoy</h3>
-          <p class="mt-2 text-3xl font-bold text-primary-600">8</p>
-          <p class="text-xs text-gray-500 mt-1">
-            Actualizado {{ lastUpdate | timeAgo }}
-          </p>
-        </div>
-        <div class="card">
-          <h3 class="text-sm font-medium text-gray-500">Pacientes</h3>
-          <p class="mt-2 text-3xl font-bold text-secondary-600">124</p>
-        </div>
-        <div class="card">
-          <h3 class="text-sm font-medium text-gray-500">Pendientes</h3>
-          <p class="mt-2 text-3xl font-bold text-yellow-600">3</p>
-        </div>
-      </div>
-
-      <!-- Table -->
-      <div>
-        <h2 class="text-xl font-bold text-gray-900 mb-4">Próximos Turnos</h2>
-        <app-table
-          [data]="appointments()"
-          [columns]="columns()"
-          [config]="tableConfig"
-          (rowClick)="onRowClick($event)"
-        />
-      </div>
-
-      <!-- Modal Example -->
-      <app-modal
-        [isOpen]="showModal()"
-        (closed)="showModal.set(false)"
-        title="Nuevo Turno"
-        [showFooter]="true"
-      >
-        <div class="space-y-4">
-          <p>Formulario de nuevo turno aquí...</p>
-          
-          <!-- Ejemplo de pipes en el modal -->
-          <div class="card bg-gray-50">
-            <h3 class="font-semibold mb-2">Ejemplo de formato</h3>
-            <div class="space-y-2 text-sm">
-              <div>
-                <strong>Fecha:</strong> {{ today | dateFormat:'dd/MM/yyyy' }}
-              </div>
-              <div>
-                <strong>DNI:</strong> {{ '12345678' | dniFormat }}
-              </div>
-              <div>
-                <strong>Teléfono:</strong> {{ '541112345678' | phoneFormat }}
-              </div>
-              <div>
-                <strong>Precio:</strong> {{ 5000 | currencyFormat }}
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div footer class="flex gap-3">
-          <button 
-            type="button" 
-            (click)="showModal.set(false)" 
-            class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-          >
-            Cancelar
-          </button>
-          <button 
-            type="button" 
-            (click)="createAppointment()" 
-            class="btn-primary"
-          >
-            Guardar
-          </button>
-        </div>
-      </app-modal>
-    </div>
-  `,
+  templateUrl: './dashboard.html',
+  styleUrls: ['./dashboard.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class Dashboard {
+export class Dashboard implements OnInit {
+  private readonly router = inject(Router);
   private readonly toastService = inject(ToastService);
+  private readonly appointmentsService = inject(AppointmentsService);
+  private readonly patientsService = inject(PatientsService);
+  private readonly authService = inject(AuthService);
 
+  // State
+  protected readonly isLoading = signal(true);
+  protected readonly showNewAppointmentModal = signal(false);
+  protected readonly selectedAppointment = signal<Appointment | null>(null);
+  protected readonly todayAppointments = signal<Appointment[]>([]);
+  protected readonly stats = signal<DashboardStats>({
+    todayAppointments: 0,
+    totalPatients: 0,
+    pendingAppointments: 0,
+    completedToday: 0
+  });
   protected readonly today = new Date();
-  protected readonly lastUpdate = new Date(Date.now() - 30 * 60 * 1000); // 30 minutos atrás
 
-  protected readonly showModal = signal(false);
-  protected readonly appointments = signal<Appointment[]>([
-    { 
-      id: '1', 
-      patient: 'Carlos Rodríguez', 
-      date: '2024-10-15', 
-      time: '10:00', 
-      status: 'Confirmado',
-      dni: '12345678',
-      phone: '541112345678',
-      price: 5000
-    },
-    { 
-      id: '2', 
-      patient: 'Ana García', 
-      date: '2024-10-15', 
-      time: '11:00', 
-      status: 'Pendiente',
-      dni: '23456789',
-      phone: '541123456789',
-      price: 5000
-    },
-    { 
-      id: '3', 
-      patient: 'Luis Martínez', 
-      date: '2024-10-15', 
-      time: '14:00', 
-      status: 'Confirmado',
-      dni: '34567890',
-      phone: '541134567890',
-      price: 5000
-    }
-  ]);
+  // Computed
+  protected readonly currentUser = toSignal(this.authService.currentUser$);
+  protected readonly greeting = computed(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Buenos días';
+    if (hour < 20) return 'Buenas tardes';
+    return 'Buenas noches';
+  });
 
-  protected readonly columns = signal<TableColumn<Appointment>[]>([
-    { 
-      key: 'patient', 
-      label: 'Paciente', 
+  // Table configuration
+  protected readonly tableColumns = signal<TableColumn<Appointment>[]>([
+    {
+      key: 'startTime',
+      label: 'Hora',
+      sortable: true,
+      class: 'w-24'
+    },
+    {
+      key: 'patientName',
+      label: 'Paciente',
       sortable: true,
       render: (row) => {
-        const initials = row.patient.split(' ').map(n => n[0]).join('');
+        const initials = this.getInitials(row.patientName);
         return `
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center text-sm font-medium">
+          <div class="flex items-center">
+            <div class="w-8 h-8 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center text-xs font-medium mr-3">
               ${initials}
             </div>
-            <span>${row.patient}</span>
+            <span class="font-medium">${row.patientName}</span>
           </div>
         `;
       }
     },
-    { key: 'date', label: 'Fecha', sortable: true },
-    { key: 'time', label: 'Hora', sortable: true },
+    {
+      key: 'reason',
+      label: 'Motivo',
+      sortable: true
+    },
     {
       key: 'status',
       label: 'Estado',
-      render: (row) => {
-        const colors = {
-          'Confirmado': 'bg-green-100 text-green-800',
-          'Pendiente': 'bg-yellow-100 text-yellow-800',
-          'Cancelado': 'bg-red-100 text-red-800'
-        };
-        const color = colors[row.status as keyof typeof colors] || 'bg-gray-100 text-gray-800';
-        return `<span class="px-2 py-1 rounded-full text-xs font-medium ${color}">${row.status}</span>`;
-      }
+      render: (row) => this.renderStatus(row.status)
+    },
+    {
+      key: 'actions',
+      label: 'Acciones',
+      render: (row) => this.renderActions(row)
     }
   ]);
 
   protected readonly tableConfig = {
     showPagination: true,
-    pageSize: 5,
+    pageSize: 10,
     showSearch: true,
     searchPlaceholder: 'Buscar turnos...'
   };
 
-  protected onRowClick(appointment: Appointment): void {
-    this.toastService.info(
-      'Turno seleccionado', 
-      `Paciente: ${appointment.patient} - DNI: ${appointment.dni}`
-    );
+  ngOnInit(): void {
+    this.loadDashboardData();
   }
 
+  /**
+   * Cargar datos del dashboard
+   */
+  public loadDashboardData(): void {
+    this.isLoading.set(true);
+
+    // Cargar turnos de hoy
+    this.appointmentsService.getToday().subscribe({
+      next: (appointments) => {
+        this.todayAppointments.set(appointments);
+        this.calculateStats(appointments);
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading appointments:', error);
+        this.toastService.error('Error', 'No se pudieron cargar los turnos');
+        this.isLoading.set(false);
+      }
+    });
+
+    // Cargar pacientes para el contador
+    this.patientsService.getAll().subscribe({
+      next: (patients) => {
+        this.stats.update(s => ({ ...s, totalPatients: patients.length }));
+      },
+      error: (error) => {
+        console.error('Error loading patients:', error);
+      }
+    });
+  }
+
+  /**
+   * Calcular estadísticas
+   */
+  private calculateStats(appointments: Appointment[]): void {
+    const stats: DashboardStats = {
+      todayAppointments: appointments.length,
+      totalPatients: this.stats().totalPatients,
+      pendingAppointments: appointments.filter(a => a.status === 'scheduled' || a.status === 'confirmed').length,
+      completedToday: appointments.filter(a => a.status === 'completed').length
+    };
+
+    this.stats.set(stats);
+  }
+
+  /**
+   * Manejar click en fila de tabla
+   */
+  protected onRowClick(appointment: Appointment): void {
+    this.selectedAppointment.set(appointment);
+    this.router.navigate(['/professional/appointments', appointment.id]);
+  }
+
+  /**
+   * Confirmar turno
+   */
+  protected confirmAppointment(appointment: Appointment, event: Event): void {
+    event.stopPropagation();
+
+    this.appointmentsService.confirm(appointment.id).subscribe({
+      next: () => {
+        this.toastService.success('Turno confirmado', `Turno con ${appointment.patientName} confirmado`);
+        this.loadDashboardData();
+      },
+      error: (error) => {
+        console.error('Error confirming appointment:', error);
+        this.toastService.error('Error', 'No se pudo confirmar el turno');
+      }
+    });
+  }
+
+  /**
+   * Cancelar turno
+   */
+  protected cancelAppointment(appointment: Appointment, event: Event): void {
+    event.stopPropagation();
+
+    if (confirm('¿Estás seguro de cancelar este turno?')) {
+      this.appointmentsService.cancel(appointment.id, 'Cancelado por el profesional').subscribe({
+        next: () => {
+          this.toastService.warning('Turno cancelado', `Turno con ${appointment.patientName} cancelado`);
+          this.loadDashboardData();
+        },
+        error: (error) => {
+          console.error('Error canceling appointment:', error);
+          this.toastService.error('Error', 'No se pudo cancelar el turno');
+        }
+      });
+    }
+  }
+
+  /**
+   * Navegar a agenda
+   */
+  protected goToSchedule(): void {
+    this.router.navigate(['/professional/schedule']);
+  }
+
+  /**
+   * Navegar a pacientes
+   */
+  protected goToPatients(): void {
+    this.router.navigate(['/professional/patients']);
+  }
+
+  /**
+   * Abrir modal de nuevo turno
+   */
+  protected openNewAppointmentModal(): void {
+    this.showNewAppointmentModal.set(true);
+  }
+
+  /**
+   * Cerrar modal de nuevo turno
+   */
+  protected closeNewAppointmentModal(): void {
+    this.showNewAppointmentModal.set(false);
+  }
+
+  /**
+   * Crear nuevo turno
+   */
   protected createAppointment(): void {
-    this.toastService.success('Turno creado', 'El turno se creó correctamente');
-    this.showModal.set(false);
+    this.toastService.info('Funcionalidad en desarrollo', 'Redirigiendo a la agenda...');
+    this.closeNewAppointmentModal();
+    setTimeout(() => this.goToSchedule(), 1000);
+  }
+
+  /**
+   * Renderizar estado
+   */
+  private renderStatus(status: string): string {
+    const statusConfig: Record<string, { label: string; class: string }> = {
+      scheduled: { label: 'Agendado', class: 'bg-blue-100 text-blue-800' },
+      confirmed: { label: 'Confirmado', class: 'bg-green-100 text-green-800' },
+      in_progress: { label: 'En curso', class: 'bg-purple-100 text-purple-800' },
+      completed: { label: 'Completado', class: 'bg-gray-100 text-gray-800' },
+      cancelled: { label: 'Cancelado', class: 'bg-red-100 text-red-800' },
+      no_show: { label: 'No asistió', class: 'bg-yellow-100 text-yellow-800' }
+    };
+
+    const config = statusConfig[status] || { label: status, class: 'bg-gray-100 text-gray-800' };
+    return `<span class="px-2 py-1 rounded-full text-xs font-medium ${config.class}">${config.label}</span>`;
+  }
+
+  /**
+   * Renderizar acciones
+   */
+  private renderActions(row: Appointment): string {
+    if (row.status === 'scheduled') {
+      return `
+        <div class="flex items-center gap-2">
+          <button 
+            onclick="window.dispatchEvent(new CustomEvent('confirm-appointment', { detail: '${row.id}' }))"
+            class="text-green-600 hover:text-green-800 text-sm font-medium"
+          >
+            Confirmar
+          </button>
+          <button 
+            onclick="window.dispatchEvent(new CustomEvent('cancel-appointment', { detail: '${row.id}' }))"
+            class="text-red-600 hover:text-red-800 text-sm font-medium"
+          >
+            Cancelar
+          </button>
+        </div>
+      `;
+    }
+    return '-';
+  }
+
+  /**
+   * Obtener iniciales
+   */
+  private getInitials(name: string): string {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
   }
 }
