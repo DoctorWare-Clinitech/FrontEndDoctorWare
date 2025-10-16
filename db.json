@@ -53,7 +53,13 @@
       "status": "active",
       "avatar": "https://i.pravatar.cc/150?img=68",
       "phone": "+54 9 11 4567-8901",
-      "permissions": ["users:read", "users:write", "users:delete", "reports:read", "settings:write"],
+      "permissions": [
+        "users:read",
+        "users:write",
+        "users:delete",
+        "reports:read",
+        "settings:write"
+      ],
       "createdAt": "2024-01-01T00:00:00.000Z",
       "updatedAt": "2024-10-12T00:00:00.000Z"
     }
@@ -87,12 +93,12 @@
       "startTime": "14:00",
       "endTime": "14:30",
       "duration": 30,
-      "status": "confirmed",
+      "status": "no_show",
       "type": "follow_up",
       "reason": "Control mensual",
       "createdBy": "3",
       "createdAt": "2024-10-13T00:00:00.000Z",
-      "updatedAt": "2024-10-13T00:00:00.000Z"
+      "updatedAt": "2025-10-16T03:28:41.635Z"
     },
     {
       "id": "3",
@@ -104,12 +110,102 @@
       "startTime": "11:00",
       "endTime": "11:30",
       "duration": 30,
-      "status": "scheduled",
+      "status": "confirmed",
       "type": "routine",
       "reason": "Chequeo de rutina",
       "createdBy": "2",
       "createdAt": "2024-10-14T00:00:00.000Z",
+      "updatedAt": "2025-10-16T03:21:42.410Z"
+    },
+    {
+      "id": "4",
+      "patientId": "1",
+      "patientName": "Luis Martínez",
+      "professionalId": "1",
+      "professionalName": "Dr. Juan Pérez",
+      "date": "2024-10-14T00:00:00.000Z",
+      "startTime": "14:00",
+      "endTime": "14:30",
+      "duration": 30,
+      "status": "completed",
+      "type": "follow_up",
+      "reason": "Control post-operatorio",
+      "observations": "Evolución favorable",
+      "createdBy": "1",
+      "createdAt": "2024-10-10T00:00:00.000Z",
+      "updatedAt": "2024-10-14T14:35:00.000Z"
+    },
+    {
+      "id": "5",
+      "patientId": "1",
+      "patientName": "María López",
+      "professionalId": "1",
+      "professionalName": "Dr. Juan Pérez",
+      "date": "2024-10-13T00:00:00.000Z",
+      "startTime": "16:00",
+      "endTime": "16:30",
+      "duration": 30,
+      "status": "cancelled",
+      "type": "routine",
+      "reason": "Consulta de rutina",
+      "cancellationReason": "Paciente no pudo asistir por motivos personales",
+      "cancelledAt": "2024-10-13T10:00:00.000Z",
+      "cancelledBy": "1",
+      "createdBy": "2",
+      "createdAt": "2024-10-08T00:00:00.000Z",
+      "updatedAt": "2024-10-13T10:00:00.000Z"
+    },
+    {
+      "id": "6",
+      "patientId": "1",
+      "patientName": "Jorge Fernández",
+      "professionalId": "1",
+      "professionalName": "Dr. Juan Pérez",
+      "date": "2024-10-12T00:00:00.000Z",
+      "startTime": "09:30",
+      "endTime": "10:00",
+      "duration": 30,
+      "status": "no_show",
+      "type": "first_visit",
+      "reason": "Primera consulta",
+      "createdBy": "2",
+      "createdAt": "2024-10-09T00:00:00.000Z",
+      "updatedAt": "2024-10-12T09:35:00.000Z"
+    },
+    {
+      "id": "7",
+      "patientId": "1",
+      "patientName": "Patricia Gómez",
+      "professionalId": "1",
+      "professionalName": "Dr. Juan Pérez",
+      "date": "2024-10-16T00:00:00.000Z",
+      "startTime": "10:00",
+      "endTime": "10:30",
+      "duration": 30,
+      "status": "scheduled",
+      "type": "specialist",
+      "reason": "Consulta especializada",
+      "createdBy": "1",
+      "createdAt": "2024-10-14T00:00:00.000Z",
       "updatedAt": "2024-10-14T00:00:00.000Z"
+    },
+    {
+      "id": "8",
+      "patientId": "1",
+      "patientName": "Roberto Silva",
+      "professionalId": "1",
+      "professionalName": "Dr. Juan Pérez",
+      "date": "2024-10-16T00:00:00.000Z",
+      "startTime": "14:00",
+      "endTime": "14:30",
+      "duration": 30,
+      "status": "confirmed",
+      "type": "emergency",
+      "reason": "Dolor agudo",
+      "notes": "Atención prioritaria",
+      "createdBy": "2",
+      "createdAt": "2024-10-15T00:00:00.000Z",
+      "updatedAt": "2024-10-15T10:00:00.000Z"
     }
   ],
   "patients": [
@@ -144,7 +240,9 @@
       },
       "medicalInfo": {
         "bloodType": "O+",
-        "allergies": ["Penicilina"],
+        "allergies": [
+          "Penicilina"
+        ],
         "chronicConditions": [],
         "currentMedications": [],
         "surgeries": []
@@ -164,7 +262,11 @@
       "appointmentId": "1",
       "date": "2024-10-15T10:00:00.000Z",
       "diagnosis": "Resfriado común",
-      "symptoms": ["Tos", "Congestión nasal", "Dolor de garganta"],
+      "symptoms": [
+        "Tos",
+        "Congestión nasal",
+        "Dolor de garganta"
+      ],
       "treatment": "Reposo, hidratación abundante",
       "prescriptions": [
         {
