@@ -1,0 +1,286 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "email": "doctor@test.com",
+      "password": "123456",
+      "name": "Dr. Juan Pérez",
+      "role": "professional",
+      "status": "active",
+      "avatar": "https://i.pravatar.cc/150?img=12",
+      "phone": "+54 9 11 1234-5678",
+      "specialization": "Medicina General",
+      "licenseNumber": "MN-12345",
+      "consultationDuration": 30,
+      "bio": "Médico especialista en medicina general con 10 años de experiencia",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-10-12T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "email": "secretaria@test.com",
+      "password": "123456",
+      "name": "María González",
+      "role": "secretary",
+      "status": "active",
+      "avatar": "https://i.pravatar.cc/150?img=47",
+      "phone": "+54 9 11 2345-6789",
+      "professionalId": "1",
+      "createdAt": "2024-01-15T00:00:00.000Z",
+      "updatedAt": "2024-10-12T00:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "email": "paciente@test.com",
+      "password": "123456",
+      "name": "Carlos Rodríguez",
+      "role": "patient",
+      "status": "active",
+      "avatar": "https://i.pravatar.cc/150?img=33",
+      "phone": "+54 9 11 3456-7890",
+      "dateOfBirth": "1990-05-15",
+      "dni": "12345678",
+      "address": "Av. Corrientes 1234, CABA",
+      "createdAt": "2024-02-01T00:00:00.000Z",
+      "updatedAt": "2024-10-12T00:00:00.000Z"
+    },
+    {
+      "id": "4",
+      "email": "admin@test.com",
+      "password": "123456",
+      "name": "Admin Sistema",
+      "role": "admin",
+      "status": "active",
+      "avatar": "https://i.pravatar.cc/150?img=68",
+      "phone": "+54 9 11 4567-8901",
+      "permissions": [
+        "users:read",
+        "users:write",
+        "users:delete",
+        "reports:read",
+        "settings:write"
+      ],
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-10-12T00:00:00.000Z"
+    }
+  ],
+  "appointments": [
+    {
+      "id": "1",
+      "patientId": "3",
+      "patientName": "Carlos Rodríguez",
+      "professionalId": "1",
+      "professionalName": "Dr. Juan Pérez",
+      "date": "2024-10-15T00:00:00.000Z",
+      "startTime": "10:00",
+      "endTime": "10:30",
+      "duration": 30,
+      "status": "scheduled",
+      "type": "first_visit",
+      "reason": "Consulta general",
+      "notes": "Primera consulta del paciente",
+      "createdBy": "2",
+      "createdAt": "2024-10-12T00:00:00.000Z",
+      "updatedAt": "2024-10-12T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "patientId": "3",
+      "patientName": "Carlos Rodríguez",
+      "professionalId": "1",
+      "professionalName": "Dr. Juan Pérez",
+      "date": "2024-10-20T00:00:00.000Z",
+      "startTime": "14:00",
+      "endTime": "14:30",
+      "duration": 30,
+      "status": "no_show",
+      "type": "follow_up",
+      "reason": "Control mensual",
+      "createdBy": "3",
+      "createdAt": "2024-10-13T00:00:00.000Z",
+      "updatedAt": "2025-10-16T03:28:41.635Z"
+    },
+    {
+      "id": "3",
+      "patientId": "1",
+      "patientName": "Carlos Rodríguez",
+      "professionalId": "1",
+      "professionalName": "Dr. Juan Pérez",
+      "date": "2025-10-15T00:00:00.000Z",
+      "startTime": "11:00",
+      "endTime": "11:30",
+      "duration": 30,
+      "status": "confirmed",
+      "type": "routine",
+      "reason": "Chequeo de rutina",
+      "createdBy": "2",
+      "createdAt": "2024-10-14T00:00:00.000Z",
+      "updatedAt": "2025-10-16T03:21:42.410Z"
+    },
+    {
+      "id": "4",
+      "patientId": "1",
+      "patientName": "Luis Martínez",
+      "professionalId": "1",
+      "professionalName": "Dr. Juan Pérez",
+      "date": "2024-10-14T00:00:00.000Z",
+      "startTime": "14:00",
+      "endTime": "14:30",
+      "duration": 30,
+      "status": "completed",
+      "type": "follow_up",
+      "reason": "Control post-operatorio",
+      "observations": "Evolución favorable",
+      "createdBy": "1",
+      "createdAt": "2024-10-10T00:00:00.000Z",
+      "updatedAt": "2024-10-14T14:35:00.000Z"
+    },
+    {
+      "id": "5",
+      "patientId": "1",
+      "patientName": "María López",
+      "professionalId": "1",
+      "professionalName": "Dr. Juan Pérez",
+      "date": "2024-10-13T00:00:00.000Z",
+      "startTime": "16:00",
+      "endTime": "16:30",
+      "duration": 30,
+      "status": "cancelled",
+      "type": "routine",
+      "reason": "Consulta de rutina",
+      "cancellationReason": "Paciente no pudo asistir por motivos personales",
+      "cancelledAt": "2024-10-13T10:00:00.000Z",
+      "cancelledBy": "1",
+      "createdBy": "2",
+      "createdAt": "2024-10-08T00:00:00.000Z",
+      "updatedAt": "2024-10-13T10:00:00.000Z"
+    },
+    {
+      "id": "6",
+      "patientId": "1",
+      "patientName": "Jorge Fernández",
+      "professionalId": "1",
+      "professionalName": "Dr. Juan Pérez",
+      "date": "2024-10-12T00:00:00.000Z",
+      "startTime": "09:30",
+      "endTime": "10:00",
+      "duration": 30,
+      "status": "no_show",
+      "type": "first_visit",
+      "reason": "Primera consulta",
+      "createdBy": "2",
+      "createdAt": "2024-10-09T00:00:00.000Z",
+      "updatedAt": "2024-10-12T09:35:00.000Z"
+    },
+    {
+      "id": "7",
+      "patientId": "1",
+      "patientName": "Patricia Gómez",
+      "professionalId": "1",
+      "professionalName": "Dr. Juan Pérez",
+      "date": "2024-10-16T00:00:00.000Z",
+      "startTime": "10:00",
+      "endTime": "10:30",
+      "duration": 30,
+      "status": "scheduled",
+      "type": "specialist",
+      "reason": "Consulta especializada",
+      "createdBy": "1",
+      "createdAt": "2024-10-14T00:00:00.000Z",
+      "updatedAt": "2024-10-14T00:00:00.000Z"
+    },
+    {
+      "id": "8",
+      "patientId": "1",
+      "patientName": "Roberto Silva",
+      "professionalId": "1",
+      "professionalName": "Dr. Juan Pérez",
+      "date": "2024-10-16T00:00:00.000Z",
+      "startTime": "14:00",
+      "endTime": "14:30",
+      "duration": 30,
+      "status": "confirmed",
+      "type": "emergency",
+      "reason": "Dolor agudo",
+      "notes": "Atención prioritaria",
+      "createdBy": "2",
+      "createdAt": "2024-10-15T00:00:00.000Z",
+      "updatedAt": "2024-10-15T10:00:00.000Z"
+    }
+  ],
+  "patients": [
+    {
+      "id": "1",
+      "userId": "3",
+      "name": "Carlos Rodríguez",
+      "email": "paciente@test.com",
+      "phone": "+54 9 11 3456-7890",
+      "dni": "12345678",
+      "dateOfBirth": "1990-05-15",
+      "age": 34,
+      "gender": "male",
+      "address": {
+        "street": "Av. Corrientes 1234",
+        "city": "Buenos Aires",
+        "state": "CABA",
+        "zipCode": "C1043",
+        "country": "Argentina"
+      },
+      "emergencyContact": {
+        "name": "Ana Rodríguez",
+        "phone": "+54 9 11 9876-5432",
+        "relationship": "Esposa",
+        "email": "ana@email.com"
+      },
+      "medicalInsurance": {
+        "provider": "OSDE",
+        "planName": "310",
+        "memberNumber": "123456789",
+        "validUntil": "2025-12-31"
+      },
+      "medicalInfo": {
+        "bloodType": "O+",
+        "allergies": [
+          "Penicilina"
+        ],
+        "chronicConditions": [],
+        "currentMedications": [],
+        "surgeries": []
+      },
+      "professionalId": "1",
+      "isActive": true,
+      "createdAt": "2024-02-01T00:00:00.000Z",
+      "updatedAt": "2024-10-12T00:00:00.000Z"
+    }
+  ],
+  "medicalHistory": [
+    {
+      "id": "1",
+      "patientId": "1",
+      "professionalId": "1",
+      "professionalName": "Dr. Juan Pérez",
+      "appointmentId": "1",
+      "date": "2024-10-15T10:00:00.000Z",
+      "diagnosis": "Resfriado común",
+      "symptoms": [
+        "Tos",
+        "Congestión nasal",
+        "Dolor de garganta"
+      ],
+      "treatment": "Reposo, hidratación abundante",
+      "prescriptions": [
+        {
+          "medication": "Ibuprofeno 400mg",
+          "dosage": "400mg",
+          "frequency": "Cada 8 horas",
+          "duration": "5 días",
+          "instructions": "Tomar con alimentos"
+        }
+      ],
+      "followUp": "Control en 7 días si los síntomas persisten",
+      "notes": "Paciente presenta cuadro viral típico",
+      "createdAt": "2024-10-15T10:30:00.000Z",
+      "updatedAt": "2024-10-15T10:30:00.000Z"
+    }
+  ]
+}
