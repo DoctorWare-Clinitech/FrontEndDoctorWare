@@ -10,8 +10,6 @@ import { environment } from '../../../environments/environment';
 export interface ApiRequestOptions {
   headers?: HttpHeaders | { [header: string]: string | string[] };
   params?: HttpParams | { [param: string]: string | number | boolean | ReadonlyArray<string | number | boolean> };
-  observe?: 'body';
-  responseType?: 'json';
   reportProgress?: boolean;
   withCredentials?: boolean;
   retry?: number;
@@ -43,7 +41,7 @@ export interface ApiRequestOptions {
 })
 export class ApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = environment.apiUrl;
+  private readonly baseUrl = environment.apiBaseUrl;
 
   /**
    * Realiza una petición GET
@@ -55,8 +53,9 @@ export class ApiService {
   get<T>(endpoint: string, options?: ApiRequestOptions): Observable<T> {
     const url = this.buildUrl(endpoint);
     const retryCount = options?.retry ?? 0;
+    const { retry: _, ...httpOptions } = options || {};
 
-    return this.http.get<T>(url, options as any).pipe(
+    return this.http.get<T>(url, httpOptions).pipe(
       retry(retryCount),
       catchError(this.handleError)
     );
@@ -73,8 +72,9 @@ export class ApiService {
   post<T>(endpoint: string, body: any, options?: ApiRequestOptions): Observable<T> {
     const url = this.buildUrl(endpoint);
     const retryCount = options?.retry ?? 0;
+    const { retry: _, ...httpOptions } = options || {};
 
-    return this.http.post<T>(url, body, options as any).pipe(
+    return this.http.post<T>(url, body, httpOptions).pipe(
       retry(retryCount),
       catchError(this.handleError)
     );
@@ -91,8 +91,9 @@ export class ApiService {
   put<T>(endpoint: string, body: any, options?: ApiRequestOptions): Observable<T> {
     const url = this.buildUrl(endpoint);
     const retryCount = options?.retry ?? 0;
+    const { retry: _, ...httpOptions } = options || {};
 
-    return this.http.put<T>(url, body, options as any).pipe(
+    return this.http.put<T>(url, body, httpOptions).pipe(
       retry(retryCount),
       catchError(this.handleError)
     );
@@ -109,8 +110,9 @@ export class ApiService {
   patch<T>(endpoint: string, body: any, options?: ApiRequestOptions): Observable<T> {
     const url = this.buildUrl(endpoint);
     const retryCount = options?.retry ?? 0;
+    const { retry: _, ...httpOptions } = options || {};
 
-    return this.http.patch<T>(url, body, options as any).pipe(
+    return this.http.patch<T>(url, body, httpOptions).pipe(
       retry(retryCount),
       catchError(this.handleError)
     );
@@ -126,8 +128,9 @@ export class ApiService {
   delete<T>(endpoint: string, options?: ApiRequestOptions): Observable<T> {
     const url = this.buildUrl(endpoint);
     const retryCount = options?.retry ?? 0;
+    const { retry: _, ...httpOptions } = options || {};
 
-    return this.http.delete<T>(url, options as any).pipe(
+    return this.http.delete<T>(url, httpOptions).pipe(
       retry(retryCount),
       catchError(this.handleError)
     );
