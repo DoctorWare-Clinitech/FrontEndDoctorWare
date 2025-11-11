@@ -76,10 +76,10 @@ export class PatientDetail implements OnInit {
    */
   private loadMedicalHistory(patientId: string): void {
     this.patientsService.getMedicalHistory(patientId).subscribe({
-      next: (history) => {
+      next: (history: any[]) => {
         this.medicalHistory.set(history);
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error loading medical history:', error);
         this.toastService.warning('Advertencia', 'No se pudo cargar la historia clínica');
       }

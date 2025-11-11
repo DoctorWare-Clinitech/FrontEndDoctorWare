@@ -83,6 +83,13 @@ export class PatientsService {
   }
 
   /**
+   * Obtener historial médico del paciente (alias de getHistory)
+   */
+  getMedicalHistory(patientId: string): Observable<any[]> {
+    return this.getHistory(patientId);
+  }
+
+  /**
    * Obtener resumen de pacientes
    */
   getSummary(): Observable<PatientSummary[]> {
