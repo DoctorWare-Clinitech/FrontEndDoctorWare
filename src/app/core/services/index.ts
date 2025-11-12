@@ -5,3 +5,4 @@ export * from './auth.service';
 export * from './appointments.service';
 export * from './patients.service';
 export * from './schedule.service';
+export * from './medical-history.service';
