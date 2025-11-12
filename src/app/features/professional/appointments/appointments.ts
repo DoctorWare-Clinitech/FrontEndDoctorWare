@@ -303,8 +303,8 @@ export class Appointments implements OnInit {
         this.toastService.success('Turno completado', 'El turno se completó correctamente');
         this.loadAppointments();
         this.closeDetailModal();
-        // Redirigir a historia clínica
-        this.router.navigate(['/professional/patients', appointment.patientId, 'history', 'new']);
+        // Redirigir al detalle del paciente donde se puede agregar registro médico
+        this.router.navigate(['/professional/patients', appointment.patientId]);
       },
       error: (error) => {
         console.error('Error completing appointment:', error);
