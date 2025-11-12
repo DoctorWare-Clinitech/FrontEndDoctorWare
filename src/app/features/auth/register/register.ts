@@ -5,7 +5,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-import { UserRole } from '../../../core/models';
+import { UserRole, RegisterData } from '../../../core/models';
 
 @Component({
   selector: 'app-register',
@@ -27,6 +27,19 @@ export class Register implements OnInit {
     { value: UserRole.PATIENT, label: 'Paciente', icon: '👤' }
   ];
 
+  documentTypes = [
+    { value: 'DNI', label: 'DNI' },
+    { value: 'CI', label: 'Cédula de Identidad' },
+    { value: 'Pasaporte', label: 'Pasaporte' }
+  ];
+
+  genders = [
+    { value: 'Masculino', label: 'Masculino' },
+    { value: 'Femenino', label: 'Femenino' },
+    { value: 'Otro', label: 'Otro' },
+    { value: 'Prefiere no decirlo', label: 'Prefiere no decirlo' }
+  ];
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -39,12 +52,16 @@ export class Register implements OnInit {
 
   private initForm(): void {
     this.registerForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
+      firstName: ['', [Validators.required, Validators.minLength(2)]],
+      lastName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6), this.passwordStrengthValidator]],
       confirmPassword: ['', [Validators.required]],
-      role: [UserRole.PATIENT, [Validators.required]],
+      documentNumber: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
+      documentType: ['DNI', [Validators.required]],
+      gender: ['Prefiere no decirlo', [Validators.required]],
       phone: ['', [Validators.pattern(/^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/)]],
+      role: [UserRole.PATIENT], // Mantener para futuro, pero oculto
       acceptTerms: [false, [Validators.requiredTrue]]
     }, {
       validators: this.passwordMatchValidator
@@ -81,12 +98,16 @@ export class Register implements OnInit {
   }
 
   // Getters para facilitar acceso en template
-  get name() { return this.registerForm.get('name'); }
+  get firstName() { return this.registerForm.get('firstName'); }
+  get lastName() { return this.registerForm.get('lastName'); }
   get email() { return this.registerForm.get('email'); }
   get password() { return this.registerForm.get('password'); }
   get confirmPassword() { return this.registerForm.get('confirmPassword'); }
-  get role() { return this.registerForm.get('role'); }
+  get documentNumber() { return this.registerForm.get('documentNumber'); }
+  get documentType() { return this.registerForm.get('documentType'); }
+  get gender() { return this.registerForm.get('gender'); }
   get phone() { return this.registerForm.get('phone'); }
+  get role() { return this.registerForm.get('role'); }
   get acceptTerms() { return this.registerForm.get('acceptTerms'); }
 
   togglePasswordVisibility(): void {
@@ -106,12 +127,27 @@ export class Register implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    const { name, email, password, role, phone } = this.registerForm.value;
+    const formValue = this.registerForm.value;
 
-    this.authService.register({ name, email, password, role, phone }).subscribe({
-      next: () => {
+    // Mapear los datos del formulario al formato esperado por el backend
+    const registerData: RegisterData = {
+      nombre: formValue.firstName,
+      apellido: formValue.lastName,
+      email: formValue.email,
+      password: formValue.password,
+      telefono: formValue.phone || undefined,
+      nroDocumento: parseInt(formValue.documentNumber, 10),
+      tipoDocumentoCodigo: formValue.documentType,
+      genero: formValue.gender
+    };
+
+    this.authService.register(registerData).subscribe({
+      next: (response) => {
         this.isLoading = false;
-        // La redirección se maneja automáticamente en AuthService
+        // El backend NO devuelve tokens en el registro, requiere confirmación de email
+        alert(response.message || 'Registro exitoso. Por favor verifica tu correo electrónico.');
+        // Redirigir al login después del registro exitoso
+        this.router.navigate(['/auth/login']);
       },
       error: (error) => {
         this.isLoading = false;
