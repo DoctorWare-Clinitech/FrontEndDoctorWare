@@ -1,20 +1,20 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Table, TableColumn } from '../../../shared/components/table/table';
 import { Modal } from '../../../shared/components/modal/modal';
 import { ToastService } from '../../../shared/services/toast.service';
 import { AppointmentsService } from '../../../core/services/appointments.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { 
-  DateFormatPipe, 
+import {
+  DateFormatPipe,
   TimeAgoPipe,
-  InitialsPipe 
+  InitialsPipe
 } from '../../../shared/pipes';
-import { 
-  Appointment, 
-  AppointmentStatus, 
-  AppointmentType 
+import {
+  Appointment,
+  AppointmentStatus,
+  AppointmentType
 } from '../../../core/models';
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
 
@@ -25,6 +25,7 @@ type DateFilter = 'all' | 'today' | 'week' | 'month' | 'custom';
   imports: [
     Table,
     Modal,
+    FormsModule,
     ReactiveFormsModule,
     DateFormatPipe,
     TimeAgoPipe,
@@ -48,6 +49,8 @@ export class Appointments implements OnInit {
   protected readonly showDetailModal = signal(false);
   protected readonly showFilterModal = signal(false);
   protected readonly dateFilter = signal<DateFilter>('all');
+  protected readonly isEditingObservations = signal(false);
+  protected tempObservations = '';
 
   protected filterForm!: FormGroup;
 
@@ -348,6 +351,50 @@ export class Appointments implements OnInit {
 
   protected goToPatient(patientId: string): void {
     this.router.navigate(['/professional/patients', patientId]);
+  }
+
+  /**
+   * Habilitar edición de observaciones clínicas
+   */
+  protected enableEditObservations(): void {
+    const appointment = this.selectedAppointment();
+    if (appointment) {
+      this.tempObservations = appointment.observations || '';
+      this.isEditingObservations.set(true);
+    }
+  }
+
+  /**
+   * Cancelar edición de observaciones
+   */
+  protected cancelEditObservations(): void {
+    this.isEditingObservations.set(false);
+    this.tempObservations = '';
+  }
+
+  /**
+   * Guardar observaciones clínicas
+   */
+  protected saveObservations(): void {
+    const appointment = this.selectedAppointment();
+    if (!appointment) return;
+
+    const observations = this.tempObservations.trim();
+
+    this.appointmentsService.update(appointment.id, { observations }).subscribe({
+      next: () => {
+        this.toastService.success('Guardado', 'Observaciones clínicas guardadas correctamente');
+        this.loadAppointments();
+        this.isEditingObservations.set(false);
+        this.tempObservations = '';
+        // Actualizar el appointment seleccionado
+        this.selectedAppointment.update(apt => apt ? { ...apt, observations } : null);
+      },
+      error: (error) => {
+        console.error('Error saving observations:', error);
+        this.toastService.error('Error', 'No se pudieron guardar las observaciones');
+      }
+    });
   }
 
   protected exportToCSV(): void {
