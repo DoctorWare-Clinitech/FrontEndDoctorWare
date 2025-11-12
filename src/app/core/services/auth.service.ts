@@ -5,13 +5,15 @@ import { Router } from '@angular/router';
 import { Observable, BehaviorSubject, tap, catchError, throwError } from 'rxjs';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { environment } from '../../../environments/environment';
-import { 
-  User, 
-  UserRole, 
-  LoginCredentials, 
-  RegisterData, 
+import {
+  User,
+  UserRole,
+  LoginCredentials,
+  RegisterData,
   AuthResponse,
-  DecodedToken 
+  RegisterResponse,
+  RefreshTokenRequest,
+  DecodedToken
 } from '../models';
 
 @Injectable({
@@ -58,7 +60,7 @@ export class AuthService {
    * Login de usuario
    */
   login(credentials: LoginCredentials): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.API_URL}/auth/login`, credentials)
+    return this.http.post<AuthResponse>(`${this.API_URL}/Auth/login`, credentials)
       .pipe(
         tap(response => {
           this.handleAuthResponse(response);
@@ -72,13 +74,11 @@ export class AuthService {
 
   /**
    * Registro de usuario
+   * NOTA: El backend NO devuelve tokens en el registro, requiere confirmación de email
    */
-  register(data: RegisterData): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.API_URL}/auth/register`, data)
+  register(data: RegisterData): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${this.API_URL}/Auth/register`, data)
       .pipe(
-        tap(response => {
-          this.handleAuthResponse(response);
-        }),
         catchError(error => {
           console.error('Register error:', error);
           return throwError(() => error);
@@ -166,12 +166,14 @@ export class AuthService {
    */
   refreshToken(): Observable<AuthResponse> {
     const refreshToken = this.getRefreshToken();
-    
+
     if (!refreshToken) {
       return throwError(() => new Error('No refresh token available'));
     }
 
-    return this.http.post<AuthResponse>(`${this.API_URL}/auth/refresh`, { refreshToken })
+    const request: RefreshTokenRequest = { refreshToken };
+
+    return this.http.post<AuthResponse>(`${this.API_URL}/Auth/refresh`, request)
       .pipe(
         tap(response => {
           this.handleAuthResponse(response);
@@ -186,23 +188,25 @@ export class AuthService {
 
   /**
    * Recuperar contraseña
+   * NOTA: Backend no tiene este endpoint implementado completamente aún
    */
   forgotPassword(email: string): Observable<any> {
-    return this.http.post(`${this.API_URL}/auth/forgot-password`, { email });
+    return this.http.post(`${this.API_URL}/Auth/forgot-password`, { email });
   }
 
   /**
    * Restablecer contraseña
+   * NOTA: Backend no tiene este endpoint implementado aún
    */
   resetPassword(token: string, newPassword: string): Observable<any> {
-    return this.http.post(`${this.API_URL}/auth/reset-password`, { token, newPassword });
+    return this.http.post(`${this.API_URL}/Auth/reset-password`, { token, newPassword });
   }
 
   /**
    * Obtener información del usuario actual desde el servidor
    */
   getUserProfile(): Observable<User> {
-    return this.http.get<User>(`${this.API_URL}/auth/me`)
+    return this.http.get<User>(`${this.API_URL}/Auth/me`)
       .pipe(
         tap(user => {
           this.currentUserSubject.next(user);
