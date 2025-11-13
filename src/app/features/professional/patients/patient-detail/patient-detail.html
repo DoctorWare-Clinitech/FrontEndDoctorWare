@@ -1,0 +1,450 @@
+<div class="space-y-6">
+  <!-- Header with back button -->
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <button
+        (click)="goBack()"
+        class="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <h1 class="text-3xl font-bold text-gray-900">Detalle del Paciente</h1>
+    </div>
+
+    @if (patient() && !isLoading()) {
+      <div class="flex gap-3">
+        <button
+          (click)="newAppointment()"
+          class="btn-secondary"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          Nuevo Turno
+        </button>
+        <button
+          (click)="editPatient()"
+          class="btn-primary"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+          </svg>
+          Editar
+        </button>
+      </div>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <!-- Loading state -->
+    <div class="card">
+      <div class="flex items-center justify-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    </div>
+  } @else if (patient(); as p) {
+    <!-- Patient info header card -->
+    <div class="card">
+      <div class="flex items-start gap-6">
+        <!-- Avatar -->
+        <div class="flex-shrink-0">
+          <div class="w-24 h-24 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center text-2xl font-bold">
+            {{ getInitials(p.name) }}
+          </div>
+        </div>
+
+        <!-- Basic info -->
+        <div class="flex-1">
+          <div class="flex items-center gap-3 mb-2">
+            <h2 class="text-2xl font-bold text-gray-900">{{ p.name }}</h2>
+            @if (p.medicalInfo.bloodType) {
+              <span [class]="'px-3 py-1 rounded-full text-xs font-medium ' + getBloodTypeColor(p.medicalInfo.bloodType)">
+                {{ formatBloodType(p.medicalInfo.bloodType) }}
+              </span>
+            }
+            <span [class]="'px-3 py-1 rounded-full text-xs font-medium ' + (p.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')">
+              {{ p.isActive ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+            <div>
+              <p class="text-sm text-gray-600">DNI</p>
+              <p class="font-medium">{{ p.dni }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-600">Edad</p>
+              <p class="font-medium">{{ patientAge() }} años</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-600">Fecha de Nacimiento</p>
+              <p class="font-medium">{{ p.dateOfBirth | dateFormat }}</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div>
+              <p class="text-sm text-gray-600">Teléfono</p>
+              <p class="font-medium">{{ p.phone }}</p>
+            </div>
+            @if (p.email) {
+              <div>
+                <p class="text-sm text-gray-600">Email</p>
+                <p class="font-medium">{{ p.email }}</p>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="border-b border-gray-200">
+      <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+        <button
+          (click)="setActiveTab('info')"
+          [class]="activeTab() === 'info'
+            ? 'border-primary-500 text-primary-600'
+            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+          class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+        >
+          Información Personal
+        </button>
+        <button
+          (click)="setActiveTab('medical')"
+          [class]="activeTab() === 'medical'
+            ? 'border-primary-500 text-primary-600'
+            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+          class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+        >
+          Historia Clínica
+        </button>
+        <button
+          (click)="setActiveTab('appointments')"
+          [class]="activeTab() === 'appointments'
+            ? 'border-primary-500 text-primary-600'
+            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+          class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+        >
+          Turnos
+        </button>
+      </nav>
+    </div>
+
+    <!-- Tab content: Personal Info -->
+    @if (activeTab() === 'info') {
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Address -->
+        <div class="card">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Dirección</h3>
+          <div class="space-y-2">
+            <p class="text-gray-700">{{ p.address.street }}</p>
+            <p class="text-gray-700">{{ p.address.city }}, {{ p.address.state }}</p>
+            <p class="text-gray-700">CP: {{ p.address.zipCode }}</p>
+            <p class="text-gray-700">{{ p.address.country }}</p>
+          </div>
+        </div>
+
+        <!-- Emergency Contact -->
+        @if (hasEmergencyContact()) {
+          <div class="card">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Contacto de Emergencia</h3>
+            <div class="space-y-2">
+              <div>
+                <p class="text-sm text-gray-600">Nombre</p>
+                <p class="font-medium">{{ p.emergencyContact.name }}</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600">Relación</p>
+                <p class="font-medium">{{ p.emergencyContact.relationship }}</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600">Teléfono</p>
+                <p class="font-medium">{{ p.emergencyContact.phone }}</p>
+              </div>
+              @if (p.emergencyContact.email) {
+                <div>
+                  <p class="text-sm text-gray-600">Email</p>
+                  <p class="font-medium">{{ p.emergencyContact.email }}</p>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Medical Insurance -->
+        @if (hasMedicalInsurance() && p.medicalInsurance) {
+          <div class="card">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Obra Social / Seguro</h3>
+            <div class="space-y-2">
+              <div>
+                <p class="text-sm text-gray-600">Proveedor</p>
+                <p class="font-medium">{{ p.medicalInsurance.provider }}</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600">Plan</p>
+                <p class="font-medium">{{ p.medicalInsurance.planName }}</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600">Número de Afiliado</p>
+                <p class="font-medium">{{ p.medicalInsurance.memberNumber }}</p>
+              </div>
+              @if (p.medicalInsurance.validUntil) {
+                <div>
+                  <p class="text-sm text-gray-600">Válido hasta</p>
+                  <p class="font-medium">{{ p.medicalInsurance.validUntil | dateFormat }}</p>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Medical Info -->
+        <div class="card">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Información Médica</h3>
+          <div class="space-y-3">
+            @if (p.medicalInfo.allergies.length > 0) {
+              <div>
+                <p class="text-sm text-gray-600 font-medium">Alergias</p>
+                <ul class="mt-1 space-y-1">
+                  @for (allergy of p.medicalInfo.allergies; track allergy) {
+                    <li class="text-sm text-red-700 flex items-center">
+                      <span class="w-1.5 h-1.5 bg-red-600 rounded-full mr-2"></span>
+                      {{ allergy }}
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+
+            @if (p.medicalInfo.chronicConditions.length > 0) {
+              <div>
+                <p class="text-sm text-gray-600 font-medium">Condiciones Crónicas</p>
+                <ul class="mt-1 space-y-1">
+                  @for (condition of p.medicalInfo.chronicConditions; track condition) {
+                    <li class="text-sm text-gray-700 flex items-center">
+                      <span class="w-1.5 h-1.5 bg-gray-600 rounded-full mr-2"></span>
+                      {{ condition }}
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+
+            @if (p.medicalInfo.currentMedications.length > 0) {
+              <div>
+                <p class="text-sm text-gray-600 font-medium">Medicación Actual</p>
+                <ul class="mt-1 space-y-1">
+                  @for (medication of p.medicalInfo.currentMedications; track medication) {
+                    <li class="text-sm text-gray-700 flex items-center">
+                      <span class="w-1.5 h-1.5 bg-gray-600 rounded-full mr-2"></span>
+                      {{ medication }}
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      @if (p.notes) {
+        <div class="card">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Notas Generales</h3>
+          <p class="text-gray-700 whitespace-pre-wrap">{{ p.notes }}</p>
+        </div>
+      }
+    }
+
+    <!-- Tab content: Medical History -->
+    @if (activeTab() === 'medical') {
+      <div class="card">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-gray-900">Historia Clínica</h3>
+          <button (click)="openMedicalRecordModal()" class="btn-primary">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Nuevo Registro
+          </button>
+        </div>
+
+        @if (sortedMedicalHistory().length > 0) {
+          <div class="space-y-4">
+            @for (entry of sortedMedicalHistory(); track entry.id) {
+              <div [class]="'border-l-4 rounded-r-lg p-4 ' + getRecordTypeColor(entry.type)">
+                <div class="flex items-center justify-between mb-2">
+                  <div class="flex items-center gap-3">
+                    <span class="px-2 py-1 bg-white rounded text-xs font-medium">
+                      {{ getRecordTypeName(entry.type) }}
+                    </span>
+                    <span class="text-sm text-gray-600">{{ entry.date | dateFormat }}</span>
+                  </div>
+                  @if (entry.createdByName) {
+                    <span class="text-sm font-medium text-gray-700">{{ entry.createdByName }}</span>
+                  }
+                </div>
+
+                <h4 class="font-semibold text-gray-900 mb-2">{{ entry.title }}</h4>
+                <p class="text-sm text-gray-700 mb-2">{{ entry.description }}</p>
+
+                @if (entry.diagnosis) {
+                  <div class="mt-2">
+                    <p class="text-xs font-medium text-gray-600">Diagnóstico:</p>
+                    <p class="text-sm text-gray-800">{{ entry.diagnosis }}</p>
+                  </div>
+                }
+
+                @if (entry.treatment) {
+                  <div class="mt-2">
+                    <p class="text-xs font-medium text-gray-600">Tratamiento:</p>
+                    <p class="text-sm text-gray-800">{{ entry.treatment }}</p>
+                  </div>
+                }
+
+                @if (entry.observations) {
+                  <div class="mt-2">
+                    <p class="text-xs font-medium text-gray-600">Observaciones:</p>
+                    <p class="text-sm text-gray-800">{{ entry.observations }}</p>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="text-center py-12">
+            <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <p class="text-gray-600 mb-4">No hay registros en la historia clínica</p>
+            <button (click)="openMedicalRecordModal()" class="btn-primary">
+              Agregar Primer Registro
+            </button>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Tab content: Appointments -->
+    @if (activeTab() === 'appointments') {
+      <div class="card">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Turnos del Paciente</h3>
+        <p class="text-center text-gray-600 py-8">Vista de turnos próximamente disponible</p>
+      </div>
+    }
+  }
+</div>
+
+<!-- Medical Record Modal -->
+@if (showMedicalRecordModal()) {
+  <app-modal
+    [isOpen]="showMedicalRecordModal()"
+    (closeModal)="closeMedicalRecordModal()"
+    title="Nuevo Registro Médico"
+  >
+    <form [formGroup]="medicalRecordForm" (ngSubmit)="saveMedicalRecord()" body>
+      <div class="space-y-4">
+        <!-- Type -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Registro *</label>
+          <select formControlName="type" class="input" [class.border-red-500]="hasError('type')">
+            @for (type of recordTypes; track type) {
+              <option [value]="type">{{ getRecordTypeName(type) }}</option>
+            }
+          </select>
+          @if (hasError('type')) {
+            <p class="mt-1 text-sm text-red-600">{{ getErrorMessage('type') }}</p>
+          }
+        </div>
+
+        <!-- Title -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Título *</label>
+          <input
+            type="text"
+            formControlName="title"
+            placeholder="Ej: Consulta por dolor de cabeza"
+            class="input"
+            [class.border-red-500]="hasError('title')"
+          >
+          @if (hasError('title')) {
+            <p class="mt-1 text-sm text-red-600">{{ getErrorMessage('title') }}</p>
+          }
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Descripción *</label>
+          <textarea
+            formControlName="description"
+            rows="3"
+            placeholder="Descripción detallada del motivo de consulta, síntomas, etc."
+            class="input"
+            [class.border-red-500]="hasError('description')"
+          ></textarea>
+          @if (hasError('description')) {
+            <p class="mt-1 text-sm text-red-600">{{ getErrorMessage('description') }}</p>
+          }
+        </div>
+
+        <!-- Diagnosis -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Diagnóstico</label>
+          <textarea
+            formControlName="diagnosis"
+            rows="2"
+            placeholder="Diagnóstico médico (opcional)"
+            class="input"
+          ></textarea>
+        </div>
+
+        <!-- Treatment -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Tratamiento</label>
+          <textarea
+            formControlName="treatment"
+            rows="2"
+            placeholder="Tratamiento indicado (opcional)"
+            class="input"
+          ></textarea>
+        </div>
+
+        <!-- Observations -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+          <textarea
+            formControlName="observations"
+            rows="2"
+            placeholder="Observaciones adicionales (opcional)"
+            class="input"
+          ></textarea>
+        </div>
+      </div>
+    </form>
+
+    <div footer class="flex justify-end gap-3">
+      <button
+        type="button"
+        (click)="closeMedicalRecordModal()"
+        class="btn-secondary"
+        [disabled]="isSavingRecord()"
+      >
+        Cancelar
+      </button>
+      <button
+        type="button"
+        (click)="saveMedicalRecord()"
+        class="btn-primary"
+        [disabled]="isSavingRecord()"
+      >
+        @if (isSavingRecord()) {
+          <span>Guardando...</span>
+        } @else {
+          <span>Guardar Registro</span>
+        }
+      </button>
+    </div>
+  </app-modal>
+}

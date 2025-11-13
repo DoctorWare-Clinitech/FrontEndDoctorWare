@@ -1,1 +1,259 @@
-<p>patients works!</p>
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <h1 class="text-3xl font-bold text-gray-900">Gestión de Pacientes</h1>
+    <button (click)="newPatient()" class="btn-primary">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Nuevo Paciente
+    </button>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="card">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-12 h-12 bg-primary-100 text-primary-600 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Total Pacientes</p>
+          <p class="text-2xl font-bold text-gray-900">{{ totalPatients() }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-12 h-12 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Pacientes Activos</p>
+          <p class="text-2xl font-bold text-gray-900">{{ activePatients() }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm text-gray-600">Resultados</p>
+          <p class="text-2xl font-bold text-gray-900">{{ filteredPatients().length }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="card">
+    <div class="relative">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+      </div>
+      <input
+        type="text"
+        (input)="onSearch($event)"
+        [value]="searchTerm()"
+        placeholder="Buscar por nombre, DNI, email o teléfono..."
+        class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+      >
+    </div>
+  </div>
+
+  <!-- Patients Table -->
+  <div class="card overflow-hidden">
+    @if (isLoading()) {
+      <!-- Loading State -->
+      <div class="flex items-center justify-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    } @else if (filteredPatients().length === 0) {
+      <!-- Empty State -->
+      <div class="text-center py-12">
+        <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+        @if (searchTerm()) {
+          <p class="text-gray-600">No se encontraron pacientes que coincidan con "{{ searchTerm() }}"</p>
+          <button (click)="searchTerm.set('')" class="mt-4 text-primary-600 hover:text-primary-700 font-medium">
+            Limpiar búsqueda
+          </button>
+        } @else {
+          <p class="text-gray-600 mb-4">No hay pacientes registrados</p>
+          <button (click)="newPatient()" class="btn-primary">
+            Agregar Primer Paciente
+          </button>
+        }
+      </div>
+    } @else {
+      <!-- Table -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Paciente
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                DNI
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Contacto
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Edad
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Estado
+              </th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            @for (patient of filteredPatients(); track patient.id) {
+              <tr class="hover:bg-gray-50 transition-colors">
+                <!-- Patient Name & Avatar -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center cursor-pointer" (click)="viewPatient(patient)">
+                    <div class="flex-shrink-0 h-10 w-10">
+                      <div class="h-10 w-10 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-semibold">
+                        {{ getInitials(patient.name) }}
+                      </div>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">{{ patient.name }}</div>
+                      @if (patient.email) {
+                        <div class="text-sm text-gray-500">{{ patient.email }}</div>
+                      }
+                    </div>
+                  </div>
+                </td>
+
+                <!-- DNI -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900">{{ patient.dni }}</div>
+                </td>
+
+                <!-- Contact -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900">{{ patient.phone }}</div>
+                </td>
+
+                <!-- Age -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900">{{ calculateAge(patient.dateOfBirth) }} años</div>
+                  <div class="text-xs text-gray-500">{{ patient.dateOfBirth | dateFormat }}</div>
+                </td>
+
+                <!-- Status -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span [class]="'px-2 inline-flex text-xs leading-5 font-semibold rounded-full ' + (patient.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')">
+                    {{ patient.isActive ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </td>
+
+                <!-- Actions -->
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <div class="flex items-center justify-end gap-2">
+                    <!-- View -->
+                    <button
+                      (click)="viewPatient(patient)"
+                      class="text-primary-600 hover:text-primary-900 p-1 rounded hover:bg-primary-50 transition-colors"
+                      title="Ver detalle"
+                    >
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                      </svg>
+                    </button>
+
+                    <!-- Edit -->
+                    <button
+                      (click)="editPatient(patient)"
+                      class="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 transition-colors"
+                      title="Editar"
+                    >
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                      </svg>
+                    </button>
+
+                    <!-- New Appointment -->
+                    <button
+                      (click)="newAppointment(patient)"
+                      class="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50 transition-colors"
+                      title="Nuevo turno"
+                    >
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                      </svg>
+                    </button>
+
+                    <!-- Delete -->
+                    <button
+                      (click)="confirmDelete(patient)"
+                      class="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 transition-colors"
+                      title="Eliminar"
+                    >
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+@if (showDeleteModal() && patientToDelete(); as patient) {
+  <app-modal
+    [isOpen]="showDeleteModal()"
+    (closeModal)="cancelDelete()"
+    title="Confirmar Eliminación"
+  >
+    <div body>
+      <p class="text-gray-700">
+        ¿Está seguro de que desea eliminar al paciente <strong>{{ patient.name }}</strong>?
+      </p>
+      <p class="text-sm text-gray-600 mt-2">
+        Esta acción no se puede deshacer y se eliminarán todos los datos asociados.
+      </p>
+    </div>
+
+    <div footer class="flex justify-end gap-3">
+      <button type="button" (click)="cancelDelete()" class="btn-secondary">
+        Cancelar
+      </button>
+      <button type="button" (click)="deletePatient()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+        Eliminar
+      </button>
+    </div>
+  </app-modal>
+}

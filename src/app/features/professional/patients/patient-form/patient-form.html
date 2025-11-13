@@ -1,0 +1,174 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <h1 class="text-3xl font-bold text-gray-900">
+      {{ isEditMode() ? 'Editar Paciente' : 'Nuevo Paciente' }}
+    </h1>
+  </div>
+
+  <form [formGroup]="patientForm" (ngSubmit)="onSubmit()" class="space-y-6">
+    <!-- Personal Information -->
+    <div class="card">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Información Personal</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo *</label>
+          <input type="text" formControlName="name" class="input" [class.border-red-500]="hasError('name')">
+          @if (hasError('name')) {
+            <p class="mt-1 text-sm text-red-600">{{ getErrorMessage('name') }}</p>
+          }
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">DNI *</label>
+          <input type="text" formControlName="dni" class="input" [class.border-red-500]="hasError('dni')" [readonly]="isEditMode()">
+          @if (hasError('dni')) {
+            <p class="mt-1 text-sm text-red-600">{{ getErrorMessage('dni') }}</p>
+          }
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input type="email" formControlName="email" class="input" [class.border-red-500]="hasError('email')">
+          @if (hasError('email')) {
+            <p class="mt-1 text-sm text-red-600">{{ getErrorMessage('email') }}</p>
+          }
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono *</label>
+          <input type="tel" formControlName="phone" class="input" [class.border-red-500]="hasError('phone')">
+          @if (hasError('phone')) {
+            <p class="mt-1 text-sm text-red-600">{{ getErrorMessage('phone') }}</p>
+          }
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Nacimiento *</label>
+          <input type="date" formControlName="dateOfBirth" class="input" [class.border-red-500]="hasError('dateOfBirth')">
+          @if (hasError('dateOfBirth')) {
+            <p class="mt-1 text-sm text-red-600">{{ getErrorMessage('dateOfBirth') }}</p>
+          }
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Género *</label>
+          <select formControlName="gender" class="input" [class.border-red-500]="hasError('gender')">
+            @for (gender of genders; track gender) {
+              <option [value]="gender">{{ gender }}</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Address -->
+    <div class="card" formGroupName="address">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Dirección</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Calle *</label>
+          <input type="text" formControlName="street" class="input">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Ciudad *</label>
+          <input type="text" formControlName="city" class="input">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Provincia *</label>
+          <input type="text" formControlName="state" class="input">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Código Postal *</label>
+          <input type="text" formControlName="zipCode" class="input">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">País *</label>
+          <input type="text" formControlName="country" class="input">
+        </div>
+      </div>
+    </div>
+
+    <!-- Emergency Contact -->
+    <div class="card" formGroupName="emergencyContact">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Contacto de Emergencia</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+          <input type="text" formControlName="name" class="input">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Relación *</label>
+          <input type="text" formControlName="relationship" class="input">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono *</label>
+          <input type="tel" formControlName="phone" class="input">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input type="email" formControlName="email" class="input">
+        </div>
+      </div>
+    </div>
+
+    <!-- Medical Insurance -->
+    <div class="card">
+      <div class="flex items-center mb-4">
+        <input type="checkbox" formControlName="hasMedicalInsurance" class="mr-2">
+        <label class="text-lg font-semibold text-gray-900">¿Tiene Obra Social / Seguro Médico?</label>
+      </div>
+
+      @if (patientForm.get('hasMedicalInsurance')?.value) {
+        <div formGroupName="medicalInsurance" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Proveedor *</label>
+            <input type="text" formControlName="provider" class="input">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Plan *</label>
+            <input type="text" formControlName="planName" class="input">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Número de Afiliado *</label>
+            <input type="text" formControlName="memberNumber" class="input">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Válido hasta</label>
+            <input type="date" formControlName="validUntil" class="input">
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Notes -->
+    <div class="card">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Notas</h2>
+      <textarea formControlName="notes" rows="4" class="input" placeholder="Notas adicionales sobre el paciente..."></textarea>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex justify-end gap-3">
+      <button type="button" (click)="cancel()" class="btn-secondary" [disabled]="isLoading()">
+        Cancelar
+      </button>
+      <button type="submit" class="btn-primary" [disabled]="isLoading()">
+        @if (isLoading()) {
+          <span>Guardando...</span>
+        } @else {
+          <span>{{ isEditMode() ? 'Actualizar' : 'Crear' }} Paciente</span>
+        }
+      </button>
+    </div>
+  </form>
+</div>
