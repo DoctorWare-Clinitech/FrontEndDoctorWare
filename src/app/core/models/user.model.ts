@@ -166,3 +166,53 @@ export interface DecodedToken {
   iat: number;
   exp: number;
 }
+
+/**
+ * Datos de registro para PACIENTE
+ */
+export interface RegisterPatientData {
+  nombre: string;
+  apellido: string;
+  email: string;
+  password: string;
+  telefono?: string;
+  nroDocumento: number;
+  tipoDocumentoCodigo: string;
+  genero: string;
+  // Campos específicos de paciente (opcionales)
+  obraSocial?: string;
+  numeroAfiliado?: string;
+  contactoEmergenciaNombre?: string;
+  contactoEmergenciaTelefono?: string;
+  contactoEmergenciaRelacion?: string;
+}
+
+/**
+ * Datos de registro para PROFESIONAL
+ */
+export interface RegisterProfessionalData {
+  nombre: string;
+  apellido: string;
+  email: string;
+  password: string;
+  telefono?: string;
+  nroDocumento: number;
+  tipoDocumentoCodigo: string;
+  genero: string;
+  // Campos específicos de profesional (requeridos)
+  matriculaNacional: string;
+  matriculaProvincial: string;
+  especialidadId: number;
+  titulo: string;
+  universidad: string;
+  cuit_cuil: string;
+}
+
+/**
+ * Especialidad médica
+ */
+export interface Specialty {
+  id: number;
+  nombre: string;
+  activo: boolean;
+}
