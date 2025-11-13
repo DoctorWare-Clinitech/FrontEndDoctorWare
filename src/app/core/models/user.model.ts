@@ -207,12 +207,3 @@ export interface RegisterProfessionalData {
   universidad: string;
   cuit_cuil: string;
 }
-
-/**
- * Especialidad médica
- */
-export interface Specialty {
-  id: number;
-  nombre: string;
-  activo: boolean;
-}

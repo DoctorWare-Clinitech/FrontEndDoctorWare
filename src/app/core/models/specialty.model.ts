@@ -1,14 +1,10 @@
 /**
- * Interfaz de especialidad médica
+ * Interfaz de especialidad médica (Backend response)
  */
 export interface Specialty {
-  id: string;
-  name: string;
-  description?: string;
-  code?: string;              // Código de la especialidad (ej: "CARD" para Cardiología)
-  active: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  id: number;
+  nombre: string;
+  activo: boolean;
 }
 
 /**
