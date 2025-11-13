@@ -13,7 +13,10 @@ import {
   AuthResponse,
   RegisterResponse,
   RefreshTokenRequest,
-  DecodedToken
+  DecodedToken,
+  RegisterPatientData,
+  RegisterProfessionalData,
+  Specialty
 } from '../models';
 
 @Injectable({
@@ -81,6 +84,45 @@ export class AuthService {
       .pipe(
         catchError(error => {
           console.error('Register error:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  /**
+   * Registrar paciente
+   */
+  registerPatient(data: RegisterPatientData): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${this.API_URL}/Auth/register/patient`, data)
+      .pipe(
+        catchError(error => {
+          console.error('Register patient error:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  /**
+   * Registrar profesional
+   */
+  registerProfessional(data: RegisterProfessionalData): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${this.API_URL}/Auth/register/professional`, data)
+      .pipe(
+        catchError(error => {
+          console.error('Register professional error:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  /**
+   * Obtener lista de especialidades
+   */
+  getSpecialties(): Observable<Specialty[]> {
+    return this.http.get<Specialty[]>(`${this.API_URL}/Auth/specialties`)
+      .pipe(
+        catchError(error => {
+          console.error('Get specialties error:', error);
           return throwError(() => error);
         })
       );
