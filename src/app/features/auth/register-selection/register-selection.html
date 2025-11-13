@@ -1,0 +1,123 @@
+<!-- src/app/features/auth/register-selection/register-selection.html -->
+
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-secondary-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-5xl w-full">
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <h2 class="text-4xl font-extrabold text-gray-900 mb-3">
+        ¿Cómo deseas registrarte?
+      </h2>
+      <p class="text-lg text-gray-600">
+        Selecciona el tipo de cuenta que mejor se adapte a tus necesidades
+      </p>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="grid md:grid-cols-2 gap-8 mb-8">
+
+      <!-- Tarjeta Paciente -->
+      <div
+        class="role-card bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer p-8 border-2 border-transparent hover:border-primary-500 transform hover:scale-105"
+        (click)="selectRole('patient')">
+
+        <div class="text-center mb-6">
+          <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-primary-100 mb-4">
+            <span class="text-5xl">👤</span>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900 mb-2">Soy Paciente</h3>
+          <p class="text-sm text-gray-500">Para usuarios que buscan atención médica</p>
+        </div>
+
+        <ul class="space-y-4 mb-8">
+          <li class="flex items-start">
+            <svg class="w-6 h-6 text-primary-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span class="text-gray-700">Agenda tus consultas online de forma rápida</span>
+          </li>
+          <li class="flex items-start">
+            <svg class="w-6 h-6 text-primary-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span class="text-gray-700">Accede a tu historial médico completo</span>
+          </li>
+          <li class="flex items-start">
+            <svg class="w-6 h-6 text-primary-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span class="text-gray-700">Recibe recordatorios de tus turnos</span>
+          </li>
+          <li class="flex items-start">
+            <svg class="w-6 h-6 text-primary-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span class="text-gray-700">Gestiona tu información personal</span>
+          </li>
+        </ul>
+
+        <button
+          type="button"
+          class="w-full bg-primary-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-primary-700 transition-colors duration-200 shadow-md hover:shadow-lg">
+          Continuar como Paciente
+        </button>
+      </div>
+
+      <!-- Tarjeta Profesional -->
+      <div
+        class="role-card bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer p-8 border-2 border-transparent hover:border-secondary-500 transform hover:scale-105"
+        (click)="selectRole('professional')">
+
+        <div class="text-center mb-6">
+          <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-secondary-100 mb-4">
+            <span class="text-5xl">👨‍⚕️</span>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-900 mb-2">Soy Profesional de Salud</h3>
+          <p class="text-sm text-gray-500">Para médicos y profesionales sanitarios</p>
+        </div>
+
+        <ul class="space-y-4 mb-8">
+          <li class="flex items-start">
+            <svg class="w-6 h-6 text-secondary-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span class="text-gray-700">Gestiona tu agenda profesional</span>
+          </li>
+          <li class="flex items-start">
+            <svg class="w-6 h-6 text-secondary-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span class="text-gray-700">Administra tus pacientes eficientemente</span>
+          </li>
+          <li class="flex items-start">
+            <svg class="w-6 h-6 text-secondary-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span class="text-gray-700">Accede a historiales clínicos completos</span>
+          </li>
+          <li class="flex items-start">
+            <svg class="w-6 h-6 text-secondary-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span class="text-gray-700">Configura horarios de atención personalizados</span>
+          </li>
+        </ul>
+
+        <button
+          type="button"
+          class="w-full bg-secondary-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-secondary-700 transition-colors duration-200 shadow-md hover:shadow-lg">
+          Continuar como Profesional
+        </button>
+      </div>
+    </div>
+
+    <!-- Login Link -->
+    <div class="text-center">
+      <p class="text-gray-600">
+        ¿Ya tienes una cuenta?
+        <a routerLink="/auth/login" class="font-semibold text-primary-600 hover:text-primary-700 ml-1">
+          Inicia sesión
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
