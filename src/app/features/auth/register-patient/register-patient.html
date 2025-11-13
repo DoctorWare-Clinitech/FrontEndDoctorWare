@@ -1,0 +1,388 @@
+<!-- src/app/features/auth/register-patient/register-patient.html -->
+
+<div class="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-3xl mx-auto">
+
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <button
+        type="button"
+        (click)="goBack()"
+        class="inline-flex items-center text-primary-600 hover:text-primary-700 mb-4">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Volver a selección de rol
+      </button>
+      <h2 class="text-3xl font-extrabold text-gray-900">
+        Registro de Paciente
+      </h2>
+      <p class="mt-2 text-sm text-gray-600">
+        Completa tus datos para crear tu cuenta
+      </p>
+    </div>
+
+    <!-- Form Container -->
+    <div class="bg-white rounded-2xl shadow-xl p-8">
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+        <!-- Error Message -->
+        @if (errorMessage) {
+          <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded">
+            <div class="flex">
+              <svg class="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+              </svg>
+              <p class="text-sm text-red-700">{{ errorMessage }}</p>
+            </div>
+          </div>
+        }
+
+        <!-- Sección 1: Datos Personales -->
+        <div class="mb-8">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <span class="bg-primary-100 text-primary-700 rounded-full w-8 h-8 flex items-center justify-center mr-3 text-sm font-bold">1</span>
+            Datos Personales
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Nombre -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Nombre <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                formControlName="firstName"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                [class.border-red-500]="firstName?.invalid && firstName?.touched"
+                placeholder="Juan">
+              @if (firstName?.invalid && firstName?.touched) {
+                <p class="mt-1 text-sm text-red-600">El nombre es requerido (mínimo 2 caracteres)</p>
+              }
+            </div>
+
+            <!-- Apellido -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Apellido <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                formControlName="lastName"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                [class.border-red-500]="lastName?.invalid && lastName?.touched"
+                placeholder="Pérez">
+              @if (lastName?.invalid && lastName?.touched) {
+                <p class="mt-1 text-sm text-red-600">El apellido es requerido (mínimo 2 caracteres)</p>
+              }
+            </div>
+
+            <!-- Email -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Correo Electrónico <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="email"
+                formControlName="email"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                [class.border-red-500]="email?.invalid && email?.touched"
+                placeholder="juan.perez@example.com">
+              @if (email?.invalid && email?.touched) {
+                <p class="mt-1 text-sm text-red-600">Ingresa un correo electrónico válido</p>
+              }
+            </div>
+
+            <!-- Tipo de Documento -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Tipo de Documento <span class="text-red-500">*</span>
+              </label>
+              <select
+                formControlName="documentType"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                @for (docType of documentTypes; track docType.value) {
+                  <option [value]="docType.value">{{ docType.label }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Número de Documento -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Número de Documento <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                formControlName="documentNumber"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                [class.border-red-500]="documentNumber?.invalid && documentNumber?.touched"
+                placeholder="12345678">
+              @if (documentNumber?.invalid && documentNumber?.touched) {
+                <p class="mt-1 text-sm text-red-600">Ingresa un número de documento válido (solo números)</p>
+              }
+            </div>
+
+            <!-- Género -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Género <span class="text-red-500">*</span>
+              </label>
+              <select
+                formControlName="gender"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                @for (genderOption of genders; track genderOption.value) {
+                  <option [value]="genderOption.value">{{ genderOption.label }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Teléfono -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Teléfono
+              </label>
+              <input
+                type="tel"
+                formControlName="phone"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                [class.border-red-500]="phone?.invalid && phone?.touched"
+                placeholder="+54 11 1234-5678">
+              @if (phone?.invalid && phone?.touched) {
+                <p class="mt-1 text-sm text-red-600">Ingresa un número de teléfono válido</p>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección 2: Seguridad -->
+        <div class="mb-8">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <span class="bg-primary-100 text-primary-700 rounded-full w-8 h-8 flex items-center justify-center mr-3 text-sm font-bold">2</span>
+            Seguridad
+          </h3>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Contraseña -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Contraseña <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <input
+                  [type]="showPassword ? 'text' : 'password'"
+                  formControlName="password"
+                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 pr-10"
+                  [class.border-red-500]="password?.invalid && password?.touched"
+                  placeholder="••••••••">
+                <button
+                  type="button"
+                  (click)="togglePasswordVisibility()"
+                  class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    @if (showPassword) {
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+                    } @else {
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    }
+                  </svg>
+                </button>
+              </div>
+              @if (password?.invalid && password?.touched) {
+                <p class="mt-1 text-sm text-red-600">
+                  Mínimo 6 caracteres, incluye mayúsculas, minúsculas y números
+                </p>
+              }
+            </div>
+
+            <!-- Confirmar Contraseña -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Confirmar Contraseña <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <input
+                  [type]="showConfirmPassword ? 'text' : 'password'"
+                  formControlName="confirmPassword"
+                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 pr-10"
+                  [class.border-red-500]="(confirmPassword?.invalid && confirmPassword?.touched) || (registerForm.hasError('passwordMismatch') && confirmPassword?.touched)"
+                  placeholder="••••••••">
+                <button
+                  type="button"
+                  (click)="toggleConfirmPasswordVisibility()"
+                  class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    @if (showConfirmPassword) {
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+                    } @else {
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    }
+                  </svg>
+                </button>
+              </div>
+              @if (registerForm.hasError('passwordMismatch') && confirmPassword?.touched) {
+                <p class="mt-1 text-sm text-red-600">Las contraseñas no coinciden</p>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección 3: Datos Adicionales (Opcionales) -->
+        <div class="mb-8">
+          <button
+            type="button"
+            (click)="toggleOptionalFields()"
+            class="flex items-center justify-between w-full text-left text-lg font-semibold text-gray-900 mb-4 hover:text-primary-600">
+            <span class="flex items-center">
+              <span class="bg-gray-100 text-gray-700 rounded-full w-8 h-8 flex items-center justify-center mr-3 text-sm font-bold">3</span>
+              Datos Adicionales (Opcional)
+            </span>
+            <svg class="w-5 h-5 transform transition-transform" [class.rotate-180]="showOptionalFields" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+
+          @if (showOptionalFields) {
+            <div class="space-y-4">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Obra Social -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Obra Social
+                  </label>
+                  <input
+                    type="text"
+                    formControlName="healthInsurance"
+                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    placeholder="OSDE, Swiss Medical, etc.">
+                </div>
+
+                <!-- Número de Afiliado -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Número de Afiliado
+                  </label>
+                  <input
+                    type="text"
+                    formControlName="affiliateNumber"
+                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    placeholder="123456789">
+                </div>
+              </div>
+
+              <!-- Contacto de Emergencia -->
+              <div class="pt-4 border-t border-gray-200">
+                <h4 class="text-md font-semibold text-gray-800 mb-3">Contacto de Emergencia</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <!-- Nombre del Contacto -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      Nombre Completo
+                    </label>
+                    <input
+                      type="text"
+                      formControlName="emergencyContactName"
+                      class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      placeholder="María García">
+                  </div>
+
+                  <!-- Teléfono del Contacto -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      Teléfono
+                    </label>
+                    <input
+                      type="tel"
+                      formControlName="emergencyContactPhone"
+                      class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      [class.border-red-500]="emergencyContactPhone?.invalid && emergencyContactPhone?.touched"
+                      placeholder="+54 11 1234-5678">
+                    @if (emergencyContactPhone?.invalid && emergencyContactPhone?.touched) {
+                      <p class="mt-1 text-sm text-red-600">Ingresa un número válido</p>
+                    }
+                  </div>
+
+                  <!-- Relación -->
+                  <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                      Relación
+                    </label>
+                    <select
+                      formControlName="emergencyContactRelation"
+                      class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                      <option value="">Selecciona una opción</option>
+                      @for (relation of relationshipTypes; track relation.value) {
+                        <option [value]="relation.value">{{ relation.label }}</option>
+                      }
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Términos y Condiciones -->
+        <div class="mb-6">
+          <label class="flex items-start cursor-pointer">
+            <input
+              type="checkbox"
+              formControlName="acceptTerms"
+              class="mt-1 w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500">
+            <span class="ml-2 text-sm text-gray-700">
+              Acepto los
+              <a href="#" class="text-primary-600 hover:text-primary-700 font-medium">Términos y Condiciones</a>
+              y la
+              <a href="#" class="text-primary-600 hover:text-primary-700 font-medium">Política de Privacidad</a>
+              <span class="text-red-500">*</span>
+            </span>
+          </label>
+          @if (acceptTerms?.invalid && acceptTerms?.touched) {
+            <p class="mt-1 text-sm text-red-600">Debes aceptar los términos y condiciones</p>
+          }
+        </div>
+
+        <!-- Botones -->
+        <div class="flex flex-col sm:flex-row gap-4">
+          <button
+            type="submit"
+            [disabled]="isLoading"
+            class="flex-1 bg-primary-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-primary-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 shadow-md hover:shadow-lg">
+            @if (isLoading) {
+              <span class="flex items-center justify-center">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Registrando...
+              </span>
+            } @else {
+              Crear Cuenta
+            }
+          </button>
+
+          <button
+            type="button"
+            (click)="goBack()"
+            [disabled]="isLoading"
+            class="sm:w-auto bg-gray-200 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors duration-200">
+            Cancelar
+          </button>
+        </div>
+
+        <!-- Login Link -->
+        <div class="mt-6 text-center">
+          <p class="text-sm text-gray-600">
+            ¿Ya tienes una cuenta?
+            <a routerLink="/auth/login" class="font-semibold text-primary-600 hover:text-primary-700 ml-1">
+              Inicia sesión
+            </a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
