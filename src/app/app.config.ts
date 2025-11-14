@@ -1,5 +1,5 @@
-import { 
-  ApplicationConfig, 
+import {
+  ApplicationConfig,
   provideZoneChangeDetection,
   importProvidersFrom,
   provideBrowserGlobalErrorListeners
@@ -8,6 +8,7 @@ import { provideRouter } from '@angular/router';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideHttpClient, withInterceptors, withFetch } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideToastr } from 'ngx-toastr';
 import { JwtModule } from '@auth0/angular-jwt';
 
 import { routes } from './app.routes';
@@ -33,6 +34,14 @@ export const appConfig: ApplicationConfig = {
       ])
     ),
     provideAnimations(),
+    provideToastr({
+      timeOut: 3000,
+      positionClass: 'toast-top-right',
+      preventDuplicates: true,
+      progressBar: true,
+      closeButton: true,
+      newestOnTop: true
+    }),
     importProvidersFrom(
       JwtModule.forRoot({
         config: {

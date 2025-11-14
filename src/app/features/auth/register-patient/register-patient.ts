@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../core/services/auth.service';
 import { RegisterPatientData } from '../../../core/models';
 import { passwordMatchValidator, passwordStrengthValidator } from '../../../core/validators/validators';
@@ -49,7 +50,8 @@ export class RegisterPatient implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -113,7 +115,7 @@ export class RegisterPatient implements OnInit {
   onSubmit(): void {
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
-      this.errorMessage = 'Por favor completa todos los campos obligatorios correctamente';
+      this.toastr.warning('Por favor completa todos los campos obligatorios correctamente', 'Formulario incompleto');
       return;
     }
 
@@ -141,12 +143,17 @@ export class RegisterPatient implements OnInit {
     this.authService.registerPatient(registerData).subscribe({
       next: (response) => {
         this.isLoading = false;
-        alert(response.message || 'Registro exitoso. Por favor verifica tu correo electrónico.');
+        this.toastr.success(
+          response.message || 'Tu cuenta ha sido creada exitosamente. Revisa tu correo para confirmar tu email.',
+          'Registro exitoso',
+          { timeOut: 5000 }
+        );
         this.router.navigate(['/auth/login']);
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error.error?.message || error.message || 'Error al registrarse. Intenta nuevamente.';
+        const errorMsg = error.error?.message || error.message || 'Error al registrarse. Intenta nuevamente.';
+        this.toastr.error(errorMsg, 'Error en el registro');
         console.error('Register patient error:', error);
       }
     });

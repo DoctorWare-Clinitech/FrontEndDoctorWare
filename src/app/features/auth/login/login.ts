@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -17,7 +17,12 @@ export class Login implements OnInit {
   errorMessage = '';
   showPassword = false;
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router,
+    private toastr: ToastrService
+  ) {}
 
   ngOnInit(): void {
     this.initForm();
@@ -46,6 +51,7 @@ export class Login implements OnInit {
   onSubmit(): void {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
+      this.toastr.warning('Por favor completa todos los campos correctamente', 'Formulario incompleto');
       return;
     }
 
@@ -60,15 +66,14 @@ export class Login implements OnInit {
       next: (response) => {
         console.log('✅ Login response:', response);
         this.isLoading = false;
+        this.toastr.success('Has iniciado sesión exitosamente', 'Bienvenido');
         // La redirección se maneja en AuthService
       },
       error: (error) => {
         console.error('❌ Login error:', error);
         this.isLoading = false;
-        this.errorMessage =
-          error.error?.message ||
-          error.message ||
-          'Error al iniciar sesión. Verifica tus credenciales.';
+        const errorMsg = error.error?.message || error.message || 'Error al iniciar sesión. Verifica tus credenciales.';
+        this.toastr.error(errorMsg, 'Error de autenticación');
       },
     });
   }

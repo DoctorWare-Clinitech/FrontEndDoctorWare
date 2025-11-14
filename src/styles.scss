@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Ngx-Toastr Styles */
+@import 'ngx-toastr/toastr';
+
 /* Variables globales */
 :root {
   --color-primary: #0066CC;

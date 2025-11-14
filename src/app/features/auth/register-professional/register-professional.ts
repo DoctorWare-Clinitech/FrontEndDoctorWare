@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../core/services/auth.service';
 import { RegisterProfessionalData, Specialty } from '../../../core/models';
 import { passwordMatchValidator, passwordStrengthValidator, cuitCuilValidator } from '../../../core/validators/validators';
@@ -40,7 +41,8 @@ export class RegisterProfessional implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -84,7 +86,7 @@ export class RegisterProfessional implements OnInit {
       },
       error: (error) => {
         console.error('Error loading specialties:', error);
-        this.errorMessage = 'No se pudieron cargar las especialidades. Por favor recarga la página.';
+        this.toastr.error('No se pudieron cargar las especialidades. Por favor recarga la página.', 'Error');
         this.loadingSpecialties = false;
       }
     });
@@ -119,7 +121,7 @@ export class RegisterProfessional implements OnInit {
   onSubmit(): void {
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
-      this.errorMessage = 'Por favor completa todos los campos obligatorios correctamente';
+      this.toastr.warning('Por favor completa todos los campos obligatorios correctamente', 'Formulario incompleto');
       return;
     }
 
@@ -148,12 +150,17 @@ export class RegisterProfessional implements OnInit {
     this.authService.registerProfessional(registerData).subscribe({
       next: (response) => {
         this.isLoading = false;
-        alert(response.message || 'Registro exitoso. Por favor verifica tu correo electrónico para activar tu cuenta profesional.');
+        this.toastr.success(
+          response.message || 'Tu cuenta profesional ha sido creada exitosamente. Revisa tu correo para confirmar tu email.',
+          'Registro exitoso',
+          { timeOut: 5000 }
+        );
         this.router.navigate(['/auth/login']);
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error.error?.message || error.message || 'Error al registrarse. Intenta nuevamente.';
+        const errorMsg = error.error?.message || error.message || 'Error al registrarse. Intenta nuevamente.';
+        this.toastr.error(errorMsg, 'Error en el registro');
         console.error('Register professional error:', error);
       }
     });
