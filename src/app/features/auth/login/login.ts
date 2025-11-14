@@ -26,6 +26,7 @@ export class Login implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
+    this.loadRememberedEmail();
   }
 
   private initForm(): void {
@@ -34,6 +35,16 @@ export class Login implements OnInit {
       password: ['', [Validators.required, Validators.minLength(6)]],
       rememberMe: [false],
     });
+  }
+
+  private loadRememberedEmail(): void {
+    const rememberedEmail = localStorage.getItem('rememberedEmail');
+    if (rememberedEmail) {
+      this.loginForm.patchValue({
+        email: rememberedEmail,
+        rememberMe: true
+      });
+    }
   }
 
   get email() {
@@ -58,7 +69,7 @@ export class Login implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    const { email, password } = this.loginForm.value;
+    const { email, password, rememberMe } = this.loginForm.value;
 
     console.log('🔐 Attempting login...', { email });
 
@@ -66,6 +77,14 @@ export class Login implements OnInit {
       next: (response) => {
         console.log('✅ Login response:', response);
         this.isLoading = false;
+
+        // Guardar o eliminar email según el checkbox "Recuérdame"
+        if (rememberMe) {
+          localStorage.setItem('rememberedEmail', email);
+        } else {
+          localStorage.removeItem('rememberedEmail');
+        }
+
         this.toastr.success('Has iniciado sesión exitosamente', 'Bienvenido');
         // La redirección se maneja en AuthService
       },
