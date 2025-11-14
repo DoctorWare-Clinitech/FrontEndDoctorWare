@@ -174,7 +174,7 @@
                   [type]="showPassword ? 'text' : 'password'"
                   formControlName="password"
                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 pr-10"
-                  [class.border-red-500]="password?.invalid && password?.touched"
+                  [class]="getFieldValidationClass('password')"
                   placeholder="••••••••">
                 <button
                   type="button"
@@ -190,6 +190,18 @@
                   </svg>
                 </button>
               </div>
+              @if (passwordStrength) {
+                <div class="password-strength mt-2">
+                  <div class="strength-bar">
+                    <div class="strength-fill" [class]="passwordStrength"></div>
+                  </div>
+                  <p class="strength-text" [class]="passwordStrength">
+                    @if (passwordStrength === 'weak') { Contraseña débil }
+                    @if (passwordStrength === 'medium') { Contraseña media }
+                    @if (passwordStrength === 'strong') { Contraseña fuerte }
+                  </p>
+                </div>
+              }
               @if (password?.invalid && password?.touched) {
                 <p class="mt-1 text-sm text-red-600">
                   Mínimo 6 caracteres, incluye mayúsculas, minúsculas y números

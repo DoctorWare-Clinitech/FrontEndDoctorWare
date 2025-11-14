@@ -2,8 +2,10 @@
   max-width: 100%;
 
   // Inputs con estilos consistentes
-  input:not([type="checkbox"]):not([type="radio"]) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select:not([multiple]) {
     transition: all 0.2s ease-in-out;
+    position: relative;
 
     &:focus {
       outline: none;
@@ -12,6 +14,21 @@
 
     &.border-red-500 {
       animation: shake 0.3s ease-in-out;
+      border-color: #ef4444 !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23ef4444' viewBox='0 0 20 20'%3E%3Cpath fill-rule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z' clip-rule='evenodd'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1.25rem 1.25rem;
+      padding-right: 2.5rem;
+    }
+
+    &.border-green-500 {
+      border-color: #10b981 !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%2310b981' viewBox='0 0 20 20'%3E%3Cpath fill-rule='evenodd' d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z' clip-rule='evenodd'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1.25rem 1.25rem;
+      padding-right: 2.5rem;
     }
   }
 
@@ -70,5 +87,57 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+// Password strength indicator
+.password-strength {
+  margin-top: 0.5rem;
+
+  .strength-bar {
+    height: 4px;
+    width: 100%;
+    background-color: #e5e7eb;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 0.25rem;
+
+    .strength-fill {
+      height: 100%;
+      transition: all 0.3s ease-in-out;
+      border-radius: 2px;
+
+      &.weak {
+        width: 33%;
+        background-color: #ef4444;
+      }
+
+      &.medium {
+        width: 66%;
+        background-color: #f59e0b;
+      }
+
+      &.strong {
+        width: 100%;
+        background-color: #10b981;
+      }
+    }
+  }
+
+  .strength-text {
+    font-size: 0.75rem;
+    font-weight: 500;
+
+    &.weak {
+      color: #ef4444;
+    }
+
+    &.medium {
+      color: #f59e0b;
+    }
+
+    &.strong {
+      color: #10b981;
+    }
   }
 }

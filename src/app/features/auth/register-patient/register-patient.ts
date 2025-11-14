@@ -23,6 +23,7 @@ export class RegisterPatient implements OnInit {
   showPassword = false;
   showConfirmPassword = false;
   showOptionalFields = false;
+  passwordStrength: 'weak' | 'medium' | 'strong' | null = null;
 
   documentTypes = [
     { value: 'DNI', label: 'DNI' },
@@ -56,6 +57,7 @@ export class RegisterPatient implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
+    this.setupPasswordStrengthListener();
   }
 
   private initForm(): void {
@@ -99,6 +101,50 @@ export class RegisterPatient implements OnInit {
   get emergencyContactName() { return this.registerForm.get('emergencyContactName'); }
   get emergencyContactPhone() { return this.registerForm.get('emergencyContactPhone'); }
   get emergencyContactRelation() { return this.registerForm.get('emergencyContactRelation'); }
+
+  private setupPasswordStrengthListener(): void {
+    this.password?.valueChanges.subscribe(value => {
+      if (value) {
+        this.passwordStrength = this.calculatePasswordStrength(value);
+      } else {
+        this.passwordStrength = null;
+      }
+    });
+  }
+
+  private calculatePasswordStrength(password: string): 'weak' | 'medium' | 'strong' {
+    let strength = 0;
+
+    // Longitud
+    if (password.length >= 8) strength++;
+    if (password.length >= 12) strength++;
+
+    // Contiene minúsculas
+    if (/[a-z]/.test(password)) strength++;
+
+    // Contiene mayúsculas
+    if (/[A-Z]/.test(password)) strength++;
+
+    // Contiene números
+    if (/[0-9]/.test(password)) strength++;
+
+    // Contiene caracteres especiales
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+    if (strength <= 2) return 'weak';
+    if (strength <= 4) return 'medium';
+    return 'strong';
+  }
+
+  getFieldValidationClass(fieldName: string): string {
+    const field = this.registerForm.get(fieldName);
+    if (!field || !field.value) return '';
+
+    if (field.valid) return 'border-green-500';
+    if (field.invalid && (field.dirty || field.touched)) return 'border-red-500';
+
+    return '';
+  }
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
