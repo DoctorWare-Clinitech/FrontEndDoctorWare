@@ -237,11 +237,10 @@ export class AuthService {
   }
 
   /**
-   * Restablecer contraseña
-   * NOTA: Backend no tiene este endpoint implementado aún
+   * Restablecer contraseña con userId y token
    */
-  resetPassword(token: string, newPassword: string): Observable<any> {
-    return this.http.post(`${this.API_URL}/Auth/reset-password`, { token, newPassword });
+  resetPassword(userId: number, token: string, newPassword: string): Observable<any> {
+    return this.http.post(`${this.API_URL}/Auth/reset-password`, { userId, token, newPassword });
   }
 
   /**

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -21,7 +21,8 @@ export class ForgotPassword implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -41,6 +42,7 @@ export class ForgotPassword implements OnInit {
   onSubmit(): void {
     if (this.forgotPasswordForm.invalid) {
       this.forgotPasswordForm.markAllAsTouched();
+      this.toastr.warning('Por favor ingresa un correo electrónico válido', 'Campo requerido');
       return;
     }
 
@@ -55,10 +57,13 @@ export class ForgotPassword implements OnInit {
         this.isLoading = false;
         this.emailSent = true;
         this.successMessage = response.message || 'Se ha enviado un correo con instrucciones para restablecer tu contraseña.';
+        this.toastr.success('Revisa tu bandeja de entrada', 'Correo enviado');
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error.message || 'Error al enviar el correo. Intenta nuevamente.';
+        const errorMsg = error.error?.message || error.message || 'Error al enviar el correo. Intenta nuevamente.';
+        this.errorMessage = errorMsg;
+        this.toastr.error(errorMsg, 'Error');
         console.error('Forgot password error:', error);
       }
     });
