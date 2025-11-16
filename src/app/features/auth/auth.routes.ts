@@ -33,6 +33,10 @@ export const AUTH_ROUTES: Routes = [
       {
         path: 'reset-password',
         loadComponent: () => import('./reset-password/reset-password').then(m => m.ResetPassword)
+      },
+      {
+        path: 'verify-email',
+        loadComponent: () => import('./verify-email/verify-email').then(m => m.VerifyEmail)
       }
     ]
   }
