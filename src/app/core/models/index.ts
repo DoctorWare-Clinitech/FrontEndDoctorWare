@@ -1,6 +1,9 @@
 // User models
 export * from './user.model';
 
+// API Response models
+export * from './api-response.model';
+
 // Appointment models
 export * from './appointment.model';
 

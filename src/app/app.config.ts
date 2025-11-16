@@ -12,7 +12,7 @@ import { provideToastr } from 'ngx-toastr';
 import { JwtModule } from '@auth0/angular-jwt';
 
 import { routes } from './app.routes';
-import { jwtInterceptor, errorInterceptor } from './core/interceptors';
+import { jwtInterceptor, errorInterceptor, apiResponseInterceptor } from './core/interceptors';
 import { environment } from '../environments/environment';
 
 export function tokenGetter(): string | null {
@@ -30,6 +30,7 @@ export const appConfig: ApplicationConfig = {
       withFetch(),
       withInterceptors([
         jwtInterceptor,
+        apiResponseInterceptor,
         errorInterceptor
       ])
     ),
@@ -47,13 +48,13 @@ export const appConfig: ApplicationConfig = {
         config: {
           tokenGetter,
           allowedDomains: [
-            'localhost:3000',
+            'localhost:5000',
             'api.doctorware.com'
           ],
           disallowedRoutes: [
-            'localhost:3000/api/auth/login',
-            'localhost:3000/api/auth/register',
-            'localhost:3000/api/auth/forgot-password',
+            'localhost:5000/api/auth/login',
+            'localhost:5000/api/auth/register',
+            'localhost:5000/api/auth/forgot-password',
             'api.doctorware.com/api/auth/login',
             'api.doctorware.com/api/auth/register',
             'api.doctorware.com/api/auth/forgot-password'
