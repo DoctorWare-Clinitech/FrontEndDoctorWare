@@ -29,6 +29,9 @@ export class AppointmentsCalendarComponent implements OnInit, OnDestroy {
   loading: boolean = false;
   error: string | null = null;
 
+  // Exponer enum al template
+  AppointmentStatus = AppointmentStatus;
+
   // Horario de trabajo (8:00 AM - 8:00 PM)
   readonly START_HOUR = 8;
   readonly END_HOUR = 20;

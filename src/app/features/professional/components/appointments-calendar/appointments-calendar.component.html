@@ -56,15 +56,15 @@
     </div>
     <div class="stat-item stat-scheduled">
       <span class="stat-label">Programados:</span>
-      <span class="stat-value">{{ getAppointmentsByStatus('scheduled') }}</span>
+      <span class="stat-value">{{ getAppointmentsByStatus(AppointmentStatus.SCHEDULED) }}</span>
     </div>
     <div class="stat-item stat-confirmed">
       <span class="stat-label">Confirmados:</span>
-      <span class="stat-value">{{ getAppointmentsByStatus('confirmed') }}</span>
+      <span class="stat-value">{{ getAppointmentsByStatus(AppointmentStatus.CONFIRMED) }}</span>
     </div>
     <div class="stat-item stat-completed">
       <span class="stat-label">Atendidos:</span>
-      <span class="stat-value">{{ getAppointmentsByStatus('completed') }}</span>
+      <span class="stat-value">{{ getAppointmentsByStatus(AppointmentStatus.COMPLETED) }}</span>
     </div>
   </div>
 

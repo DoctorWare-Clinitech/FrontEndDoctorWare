@@ -17,4 +17,4 @@ export * from './clinical-note.model';
 export * from './schedule.model';
 
 // Specialty models (explicit exports to avoid conflicts)
-export { Specialty, CreateSpecialtyDto, UpdateSpecialtyDto } from './specialty.model';
+export type { Specialty, CreateSpecialtyDto, UpdateSpecialtyDto } from './specialty.model';

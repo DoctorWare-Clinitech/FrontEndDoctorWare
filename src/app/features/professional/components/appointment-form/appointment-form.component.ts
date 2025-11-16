@@ -133,7 +133,7 @@ export class AppointmentFormComponent implements OnInit, OnDestroy {
     const appointmentData = {
       patientId: formValue.patientId,
       professionalId: formValue.professionalId,
-      date: dateTime.toISOString(),
+      date: dateTime,
       startTime: formValue.startTime,
       duration: formValue.duration,
       type: formValue.type,
