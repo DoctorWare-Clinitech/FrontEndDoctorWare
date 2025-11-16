@@ -1,5 +1,5 @@
 import { HttpInterceptorFn, HttpResponse, HttpErrorResponse } from '@angular/common/http';
-import { tap, catchError } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { ApiResponse, ApiError } from '../models/api-response.model';
 
@@ -13,7 +13,7 @@ import { ApiResponse, ApiError } from '../models/api-response.model';
  */
 export const apiResponseInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
-    tap(event => {
+    map((event) => {
       // Solo procesar respuestas HTTP exitosas
       if (event instanceof HttpResponse) {
         const body = event.body;
@@ -48,6 +48,9 @@ export const apiResponseInterceptor: HttpInterceptorFn = (req, next) => {
           }
         }
       }
+
+      // Si no es una respuesta HTTP o no tiene el formato ApiResponse, devolver sin modificar
+      return event;
     }),
     catchError((error: HttpErrorResponse) => {
       // Si el error ya tiene el formato ApiResponse en error.error, no hacer nada

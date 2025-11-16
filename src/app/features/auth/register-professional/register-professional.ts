@@ -81,15 +81,24 @@ export class RegisterProfessional implements OnInit {
 
   private loadSpecialties(): void {
     this.loadingSpecialties = true;
+
+    // Deshabilitar el campo mientras se cargan las especialidades
+    this.registerForm.get('specialtyId')?.disable();
+
     this.authService.getSpecialties().subscribe({
       next: (specialties) => {
         this.specialties = specialties.filter(s => s.activo);
         this.loadingSpecialties = false;
+
+        // Habilitar el campo cuando se carguen las especialidades
+        this.registerForm.get('specialtyId')?.enable();
       },
       error: (error) => {
         console.error('Error loading specialties:', error);
         this.toastr.error('No se pudieron cargar las especialidades. Por favor recarga la página.', 'Error');
         this.loadingSpecialties = false;
+
+        // Mantener deshabilitado si hubo un error
       }
     });
   }

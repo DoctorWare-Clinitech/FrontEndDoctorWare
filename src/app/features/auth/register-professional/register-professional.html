@@ -290,8 +290,7 @@
               <select
                 formControlName="specialtyId"
                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-secondary-500 focus:border-secondary-500"
-                [class.border-red-500]="specialtyId?.invalid && specialtyId?.touched"
-                [disabled]="loadingSpecialties">
+                [class.border-red-500]="specialtyId?.invalid && specialtyId?.touched">
                 <option value="">
                   {{ loadingSpecialties ? 'Cargando especialidades...' : 'Selecciona tu especialidad' }}
                 </option>
