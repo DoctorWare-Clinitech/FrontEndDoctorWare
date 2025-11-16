@@ -116,10 +116,10 @@ export class AuthService {
   }
 
   /**
-   * Obtener lista de especialidades
+   * Obtener lista de especialidades (endpoint público)
    */
   getSpecialties(): Observable<Specialty[]> {
-    return this.http.get<Specialty[]>(`${this.API_URL}/Auth/specialties`)
+    return this.http.get<Specialty[]>(`${this.API_URL}/specialties`)
       .pipe(
         catchError(error => {
           console.error('Get specialties error:', error);

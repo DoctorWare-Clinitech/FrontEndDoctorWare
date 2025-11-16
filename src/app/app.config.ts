@@ -55,9 +55,11 @@ export const appConfig: ApplicationConfig = {
             'localhost:5000/api/auth/login',
             'localhost:5000/api/auth/register',
             'localhost:5000/api/auth/forgot-password',
+            'localhost:5000/api/specialties',
             'api.doctorware.com/api/auth/login',
             'api.doctorware.com/api/auth/register',
-            'api.doctorware.com/api/auth/forgot-password'
+            'api.doctorware.com/api/auth/forgot-password',
+            'api.doctorware.com/api/specialties'
           ],
           // NO configurar secretKey aquí, solo el backend lo necesita
           skipWhenExpired: false
