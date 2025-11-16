@@ -2,10 +2,11 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, combineLatest, startWith } from 'rxjs';
 import { AppointmentService } from '../../../../core/services/appointment.service';
 import {
   AppointmentType,
+  AppointmentStatus,
   CreateAppointmentDto,
   UpdateAppointmentDto
 } from '../../../../core/models/appointment.model';
@@ -53,6 +54,7 @@ export class AppointmentFormComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.initializeForm();
+    this.setupEndTimeCalculation();
     this.checkEditMode();
   }
 
@@ -67,7 +69,9 @@ export class AppointmentFormComponent implements OnInit, OnDestroy {
       professionalId: ['', [Validators.required]],
       date: ['', [Validators.required]],
       startTime: ['', [Validators.required]],
+      endTime: [''], // Calculado automáticamente
       duration: [30, [Validators.required, Validators.min(15), Validators.max(240)]],
+      status: [AppointmentStatus.SCHEDULED], // Por defecto "Programado"
       type: [AppointmentType.ROUTINE, [Validators.required]],
       reason: ['', [Validators.maxLength(500)]],
       notes: ['', [Validators.maxLength(1000)]]
@@ -81,6 +85,30 @@ export class AppointmentFormComponent implements OnInit, OnDestroy {
       this.appointmentId = id;
       this.loadAppointment(id);
     }
+  }
+
+  private setupEndTimeCalculation(): void {
+    // Calcular endTime automáticamente cuando cambia startTime o duration
+    combineLatest([
+      this.appointmentForm.get('startTime')!.valueChanges.pipe(startWith('')),
+      this.appointmentForm.get('duration')!.valueChanges.pipe(startWith(30))
+    ]).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(([startTime, duration]) => {
+      if (startTime && duration) {
+        const endTime = this.calculateEndTime(startTime, duration);
+        this.appointmentForm.patchValue({ endTime }, { emitEvent: false });
+      }
+    });
+  }
+
+  private calculateEndTime(startTime: string, duration: number): string {
+    const [hours, minutes] = startTime.split(':').map(Number);
+    const totalMinutes = hours * 60 + minutes + duration;
+    const endHours = Math.floor(totalMinutes / 60);
+    const endMinutes = totalMinutes % 60;
+
+    return `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
   }
 
   private loadAppointment(id: string): void {
@@ -135,7 +163,9 @@ export class AppointmentFormComponent implements OnInit, OnDestroy {
       professionalId: formValue.professionalId,
       date: dateTime,
       startTime: formValue.startTime,
+      endTime: formValue.endTime, // Incluir endTime calculado
       duration: formValue.duration,
+      status: formValue.status, // Incluir status (por defecto SCHEDULED)
       type: formValue.type,
       reason: formValue.reason || undefined,
       notes: formValue.notes || undefined
@@ -212,8 +242,16 @@ export class AppointmentFormComponent implements OnInit, OnDestroy {
     return this.appointmentForm.get('startTime');
   }
 
+  get endTime() {
+    return this.appointmentForm.get('endTime');
+  }
+
   get duration() {
     return this.appointmentForm.get('duration');
+  }
+
+  get status() {
+    return this.appointmentForm.get('status');
   }
 
   get type() {

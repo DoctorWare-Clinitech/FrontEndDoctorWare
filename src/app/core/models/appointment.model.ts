@@ -55,7 +55,9 @@ export interface CreateAppointmentDto {
   professionalId: string;
   date: Date;
   startTime: string;
+  endTime: string; // Calculado desde startTime + duration
   duration: number;
+  status: AppointmentStatus; // Por defecto SCHEDULED
   type: AppointmentType;
   reason?: string;
   notes?: string;
@@ -67,6 +69,7 @@ export interface CreateAppointmentDto {
 export interface UpdateAppointmentDto {
   date?: Date;
   startTime?: string;
+  endTime?: string;
   duration?: number;
   status?: AppointmentStatus;
   type?: AppointmentType;
