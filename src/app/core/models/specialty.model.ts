@@ -4,7 +4,7 @@
 export interface Specialty {
   id: number;
   nombre: string;
-  activo: boolean;
+  activo?: boolean; // Opcional porque el backend no siempre lo devuelve
 }
 
 /**

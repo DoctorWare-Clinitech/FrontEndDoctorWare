@@ -87,7 +87,8 @@ export class RegisterProfessional implements OnInit {
 
     this.authService.getSpecialties().subscribe({
       next: (specialties) => {
-        this.specialties = specialties.filter(s => s.activo);
+        // El backend solo devuelve especialidades activas, no necesitamos filtrar
+        this.specialties = specialties;
         this.loadingSpecialties = false;
 
         // Habilitar el campo cuando se carguen las especialidades
