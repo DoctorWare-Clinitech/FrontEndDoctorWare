@@ -4,7 +4,7 @@ import { forkJoin, finalize } from 'rxjs';
 import { startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
 
 import { ScheduleService } from '../../../../core/services/schedule.service';
-import { AvailableSlot } from '../../../../core/models/schedule.model';
+import { AvailableSlot } from '../../../../core/models/appointment/schedule.model';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { DateFormatPipe } from '../../../../shared/pipes';
 

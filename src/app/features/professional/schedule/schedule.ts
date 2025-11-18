@@ -5,8 +5,8 @@ import { Calendar, CalendarEvent } from '../../../shared/components/calendar/cal
 import { Modal } from '../../../shared/components/modal/modal';
 import { ToastService } from '../../../shared/services/toast.service';
 import { ScheduleService } from '../../../core/services/schedule.service';
-import { TimeSlot, BlockedSlot, UpdateScheduleConfigDto, AvailableSlot } from '../../../core/models/schedule.model';
-import { Appointment, AppointmentStatus } from '../../../core/models/appointment.model';
+import { TimeSlot, BlockedSlot, UpdateScheduleConfigDto, AvailableSlot } from '../../../core/models/appointment/schedule.model';
+import { Appointment, AppointmentStatus } from '../../../core/models/appointment/appointment.model';
 import { AppointmentsService } from '../../../core/services/appointments.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { DateFormatPipe } from '../../../shared/pipes';

@@ -12,7 +12,7 @@ export const PROFESSIONAL_ROUTES: Routes = [
       },
       {
         path: 'dashboard',
-        loadComponent: () => import('./dashboard/dashboard').then(m => m.Dashboard)
+        loadComponent: () => import('./pages/dashboard').then(m => m.Dashboard)
       },
       {
         path: 'appointments',

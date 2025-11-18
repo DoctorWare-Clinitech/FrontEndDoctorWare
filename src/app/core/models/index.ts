@@ -1,23 +1,14 @@
-// User models
-export * from './user.model';
-
 // API Response models
 export * from './api-response.model';
 
-// Appointment models
-export * from './appointment.model';
+// Dashboard models
+export * from './dashboard.model';
 
-// Patient models
-export * from './patient.model';
-
-// Medical history models
-export * from './medical-history.model';
-
-// Clinical notes models
-export * from './clinical-note.model';
-
-// Schedule models
-export * from './schedule.model';
-
-// Specialty models (explicit exports to avoid conflicts)
-export type { Specialty, CreateSpecialtyDto, UpdateSpecialtyDto } from './specialty.model';
+// Domain-specific models
+export * from './appointment/appointment.model';
+export * from './appointment/schedule.model';
+export * from './patient/patient.model';
+export * from './patient/medical-history.model';
+export * from './patient/clinical-note.model';
+export * from './user/user.model';
+export * from './user/specialty.model';

@@ -4,7 +4,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { provideRouter } from '@angular/router';
 import { provideToastr } from 'ngx-toastr';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { RegisterPatientData, RegisterProfessionalData } from '../../../core/models/user.model';
+import { RegisterPatientData, RegisterProfessionalData } from '../../../core/models/user/user.model';
 import { JwtHelperService, JWT_OPTIONS } from '@auth0/angular-jwt';
 
 /**

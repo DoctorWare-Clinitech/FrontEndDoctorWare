@@ -3,19 +3,7 @@
  * Interfaces para el Dashboard del Profesional
  */
 
-import { Appointment } from './appointment.model';
-
-/**
- * Estadísticas de turnos del backend
- */
-export interface AppointmentStats {
-  total: number;
-  scheduled: number;
-  confirmed: number;
-  completed: number;
-  cancelled: number;
-  noShow: number;
-}
+import { Appointment, AppointmentStats } from './appointment/appointment.model';
 
 /**
  * Estadísticas calculadas para el Dashboard

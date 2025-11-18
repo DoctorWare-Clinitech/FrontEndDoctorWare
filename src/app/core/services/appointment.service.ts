@@ -8,7 +8,7 @@ import {
   UpdateAppointmentDto,
   AppointmentFilters,
   AppointmentStats
-} from '../models/appointment.model';
+} from '../models/appointment/appointment.model';
 
 @Injectable({
   providedIn: 'root'

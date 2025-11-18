@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { AppointmentService } from '../../../../core/services/appointment.service';
-import { Appointment, AppointmentStatus } from '../../../../core/models/appointment.model';
+import { Appointment, AppointmentStatus } from '../../../../core/models/appointment/appointment.model';
 import { StatusBadgeComponent } from '../../../../shared/components/status-badge/status-badge.component';
 
 interface TimeSlot {

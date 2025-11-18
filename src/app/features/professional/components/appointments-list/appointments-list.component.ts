@@ -9,7 +9,7 @@ import {
   AppointmentFilters,
   AppointmentStatus,
   AppointmentType
-} from '../../../../core/models/appointment.model';
+} from '../../../../core/models/appointment/appointment.model';
 import { AppointmentCardComponent } from '../../../../shared/components/appointment-card/appointment-card.component';
 
 @Component({

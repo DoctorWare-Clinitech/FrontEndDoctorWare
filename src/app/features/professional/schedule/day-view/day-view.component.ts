@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { finalize } from 'rxjs';
 
 import { ScheduleService } from '../../../../core/services/schedule.service';
-import { AvailableSlot } from '../../../../core/models/schedule.model';
+import { AvailableSlot } from '../../../../core/models/appointment/schedule.model';
 import { ToastService } from '../../../../shared/services/toast.service';
 import { DateFormatPipe } from '../../../../shared/pipes';
 

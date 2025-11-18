@@ -11,7 +11,7 @@ import {
   UpdateTimeSlotDto,
   CreateBlockedSlotDto,
   UpdateScheduleConfigDto
-} from '../models/schedule.model';
+} from '../models/appointment/schedule.model';
 
 @Injectable({
   providedIn: 'root'

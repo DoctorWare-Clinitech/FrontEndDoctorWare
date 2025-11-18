@@ -5,7 +5,7 @@ import { environment } from '../../../../environments/environment';
 import { provideRouter } from '@angular/router';
 import { provideToastr } from 'ngx-toastr';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { RegisterData, RegisterPatientData, RegisterProfessionalData } from '../../../core/models/user.model';
+import { RegisterData, RegisterPatientData, RegisterProfessionalData } from '../../../core/models/user/user.model';
 import { JwtHelperService, JWT_OPTIONS } from '@auth0/angular-jwt';
 
 /**

@@ -9,7 +9,7 @@ import {
   AppointmentStatus,
   CreateAppointmentDto,
   UpdateAppointmentDto
-} from '../../../../core/models/appointment.model';
+} from '../../../../core/models/appointment/appointment.model';
 
 @Component({
   selector: 'app-appointment-form',

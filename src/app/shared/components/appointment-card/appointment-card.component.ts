@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Appointment, AppointmentStatus } from '../../../core/models/appointment.model';
+import { Appointment, AppointmentStatus } from '../../../core/models/appointment/appointment.model';
 import { StatusBadgeComponent } from '../status-badge/status-badge.component';
 
 @Component({

@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AppointmentStatus } from '../../../core/models/appointment.model';
+import { AppointmentStatus } from '../../../core/models/appointment/appointment.model';
 
 @Component({
   selector: 'app-status-badge',
