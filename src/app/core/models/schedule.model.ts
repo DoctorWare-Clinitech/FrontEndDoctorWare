@@ -1,109 +1,48 @@
-/**
- * Días de la semana
- */
-export enum DayOfWeek {
-  SUNDAY = 0,
-  MONDAY = 1,
-  TUESDAY = 2,
-  WEDNESDAY = 3,
-  THURSDAY = 4,
-  FRIDAY = 5,
-  SATURDAY = 6
-}
-
-/**
- * Estado del horario
- */
-export enum ScheduleStatus {
-  ACTIVE = 'active',           // Activo
-  INACTIVE = 'inactive',       // Inactivo
-  TEMPORARY = 'temporary'      // Temporal (vacaciones, licencia, etc.)
-}
-
-/**
- * Horario de trabajo del profesional
- */
-export interface Schedule {
+// Corresponds to ScheduleTimeSlotDto in backend
+export interface TimeSlot {
   id: string;
-  professionalId: string;
-  dayOfWeek: DayOfWeek;
-  startTime: string;           // Formato: "HH:mm"
-  endTime: string;             // Formato: "HH:mm"
-  slotDuration: number;        // Duración de cada turno en minutos
-  status: ScheduleStatus;
-  validFrom?: Date;            // Fecha desde la cual es válido
-  validUntil?: Date;           // Fecha hasta la cual es válido
-  notes?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  dayOfWeek: number; // 0 = Sunday, 1 = Monday, etc.
+  startTime: string; // "09:00"
+  endTime: string; // "17:00"
+  duration: number; // minutes per consultation
+  isActive: boolean;
 }
 
-/**
- * Bloqueo de horario (para días no laborables, vacaciones, etc.)
- */
-export interface ScheduleBlock {
+// Corresponds to ScheduleBlockedSlotDto in backend
+export interface BlockedSlot {
   id: string;
-  professionalId: string;
-  startDate: Date;
-  endDate: Date;
-  startTime?: string;          // Si es null, bloquea todo el día
-  endTime?: string;
-  reason: string;
-  recurring?: boolean;         // Si se repite anualmente
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-/**
- * Datos para crear un horario
- */
-export interface CreateScheduleDto {
-  professionalId: string;
-  dayOfWeek: DayOfWeek;
+  date: Date;
   startTime: string;
   endTime: string;
-  slotDuration: number;
-  status?: ScheduleStatus;
-  validFrom?: Date;
-  validUntil?: Date;
-  notes?: string;
-}
-
-/**
- * Datos para actualizar un horario
- */
-export interface UpdateScheduleDto {
-  dayOfWeek?: DayOfWeek;
-  startTime?: string;
-  endTime?: string;
-  slotDuration?: number;
-  status?: ScheduleStatus;
-  validFrom?: Date;
-  validUntil?: Date;
-  notes?: string;
-}
-
-/**
- * Datos para crear un bloqueo
- */
-export interface CreateScheduleBlockDto {
-  professionalId: string;
-  startDate: Date;
-  endDate: Date;
-  startTime?: string;
-  endTime?: string;
   reason: string;
-  recurring?: boolean;
+  createdAt: Date;
 }
 
-/**
- * Configuración de disponibilidad
- */
-export interface AvailabilityConfig {
+// Corresponds to ScheduleConfigDto in backend
+export interface ScheduleConfig {
   professionalId: string;
-  schedules: Schedule[];
-  blocks: ScheduleBlock[];
-  defaultSlotDuration: number;
-  minAdvanceBooking: number;   // Días mínimos de anticipación
-  maxAdvanceBooking: number;   // Días máximos de anticipación
+  timeSlots: TimeSlot[];
+  blockedSlots: BlockedSlot[];
+  consultationDuration: number; // default duration in minutes
 }
+
+// Corresponds to ScheduleAvailableSlotDto in backend
+export interface AvailableSlot {
+  date: Date;
+  time: string;
+  available: boolean;
+  appointmentId?: string;
+  duration: number; // This was missing
+}
+
+// DTO for creating a time slot
+export type CreateTimeSlotDto = Omit<TimeSlot, 'id'>;
+
+// DTO for updating a time slot
+export type UpdateTimeSlotDto = Partial<Omit<TimeSlot, 'id'>>;
+
+// DTO for creating a blocked slot
+export type CreateBlockedSlotDto = Omit<BlockedSlot, 'id' | 'createdAt'>;
+
+// DTO for updating the schedule config
+export type UpdateScheduleConfigDto = Partial<Omit<ScheduleConfig, 'professionalId' | 'timeSlots' | 'blockedSlots'>>;

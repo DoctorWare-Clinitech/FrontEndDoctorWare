@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -16,13 +17,17 @@ export class Login implements OnInit {
   isLoading = false;
   errorMessage = '';
   showPassword = false;
+  private isBrowser: boolean;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private toastr: ToastrService
-  ) {}
+    private toastr: ToastrService,
+    @Inject(PLATFORM_ID) platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
 
   ngOnInit(): void {
     this.initForm();
@@ -38,6 +43,8 @@ export class Login implements OnInit {
   }
 
   private loadRememberedEmail(): void {
+    if (!this.isBrowser) return; // Solo ejecutar en el navegador
+
     const rememberedEmail = localStorage.getItem('rememberedEmail');
     if (rememberedEmail) {
       this.loginForm.patchValue({
@@ -78,11 +85,13 @@ export class Login implements OnInit {
         console.log('✅ Login response:', response);
         this.isLoading = false;
 
-        // Guardar o eliminar email según el checkbox "Recuérdame"
-        if (rememberMe) {
-          localStorage.setItem('rememberedEmail', email);
-        } else {
-          localStorage.removeItem('rememberedEmail');
+        // Guardar o eliminar email según el checkbox "Recuérdame" (solo en navegador)
+        if (this.isBrowser) {
+          if (rememberMe) {
+            localStorage.setItem('rememberedEmail', email);
+          } else {
+            localStorage.removeItem('rememberedEmail');
+          }
         }
 
         this.toastr.success('Has iniciado sesión exitosamente', 'Bienvenido');

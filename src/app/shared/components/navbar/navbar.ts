@@ -7,7 +7,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
   selector: 'app-navbar',
   imports: [RouterLink],
   template: `
-    <nav class="bg-white shadow-md border-b border-gray-200">
+    <nav class="bg-white shadow-md border-b border-gray-200" style="position: fixed; width: 100%; z-index: 10;">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
           

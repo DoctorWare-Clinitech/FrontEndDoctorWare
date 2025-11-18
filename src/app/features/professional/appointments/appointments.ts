@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Table, TableColumn } from '../../../shared/components/table/table';
 import { Modal } from '../../../shared/components/modal/modal';
@@ -13,10 +13,13 @@ import {
 } from '../../../shared/pipes';
 import {
   Appointment,
+  AppointmentStats,
   AppointmentStatus,
-  AppointmentType
+  AppointmentType,
+  AppointmentFilters
 } from '../../../core/models';
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
+import { finalize } from 'rxjs';
 
 type DateFilter = 'all' | 'today' | 'week' | 'month' | 'custom';
 
@@ -27,6 +30,7 @@ type DateFilter = 'all' | 'today' | 'week' | 'month' | 'custom';
     Modal,
     FormsModule,
     ReactiveFormsModule,
+    RouterLink,
     DateFormatPipe,
     TimeAgoPipe,
     InitialsPipe
@@ -44,7 +48,7 @@ export class Appointments implements OnInit {
 
   // State
   protected readonly isLoading = signal(true);
-  protected readonly appointments = signal<Appointment[]>([]);
+  protected readonly appointments = this.appointmentsService.appointments;
   protected readonly selectedAppointment = signal<Appointment | null>(null);
   protected readonly showDetailModal = signal(false);
   protected readonly showFilterModal = signal(false);
@@ -54,106 +58,43 @@ export class Appointments implements OnInit {
 
   protected filterForm!: FormGroup;
 
-  // Computed
-  protected readonly currentUser = this.authService.currentUser$;
-  
-  protected readonly filteredAppointments = computed(() => {
-    let result = this.appointments();
-    const filters = this.filterForm?.value;
-
-    if (!filters) return result;
-
-    // Filtrar por estado
-    if (filters.status && filters.status !== 'all') {
-      result = result.filter(a => a.status === filters.status);
-    }
-
-    // Filtrar por tipo
-    if (filters.type && filters.type !== 'all') {
-      result = result.filter(a => a.type === filters.type);
-    }
-
-    // Filtrar por fecha
-    if (filters.startDate) {
-      const startDate = new Date(filters.startDate);
-      result = result.filter(a => new Date(a.date) >= startDate);
-    }
-
-    if (filters.endDate) {
-      const endDate = new Date(filters.endDate);
-      result = result.filter(a => new Date(a.date) <= endDate);
-    }
-
-    // Filtrar por paciente
-    if (filters.patientName) {
-      const search = filters.patientName.toLowerCase();
-      result = result.filter(a => a.patientName.toLowerCase().includes(search));
-    }
-
-    return result;
+  protected readonly stats = signal<AppointmentStats>({
+    total: 0, scheduled: 0, confirmed: 0, completed: 0, cancelled: 0, noShow: 0
   });
 
-  protected readonly stats = computed(() => {
-    const all = this.filteredAppointments();
-    return {
-      total: all.length,
-      scheduled: all.filter(a => a.status === 'scheduled').length,
-      confirmed: all.filter(a => a.status === 'confirmed').length,
-      completed: all.filter(a => a.status === 'completed').length,
-      cancelled: all.filter(a => a.status === 'cancelled').length,
-      noShow: all.filter(a => a.status === 'no_show').length
-    };
+  // Computed
+  protected readonly professionalId = computed(() => this.authService.getCurrentUser()?.id || '');
+
+  protected readonly filteredAppointments = computed(() => {
+    let data = this.appointments();
+    const filters = this.filterForm.value;
+
+    if (filters.status && filters.status !== 'all') {
+      data = data.filter(a => a.status === filters.status);
+    }
+    if (filters.type && filters.type !== 'all') {
+      data = data.filter(a => a.type === filters.type);
+    }
+    // The table component handles text search, so we don't need to filter by patientName here.
+    return data;
   });
 
   // Table configuration
   protected readonly tableColumns = signal<TableColumn<Appointment>[]>([
-    {
-      key: 'date',
-      label: 'Fecha',
-      sortable: true,
-      render: (row) => this.renderDate(row)
-    },
-    {
-      key: 'startTime',
-      label: 'Hora',
-      sortable: true,
-      class: 'w-24'
-    },
-    {
-      key: 'patientName',
-      label: 'Paciente',
-      sortable: true,
-      render: (row) => this.renderPatient(row)
-    },
-    {
-      key: 'type',
-      label: 'Tipo',
-      sortable: true,
-      render: (row) => this.renderType(row.type)
-    },
-    {
-      key: 'reason',
-      label: 'Motivo',
-      sortable: true
-    },
-    {
-      key: 'status',
-      label: 'Estado',
-      sortable: true,
-      render: (row) => this.renderStatus(row.status)
-    },
-    {
-      key: 'actions',
-      label: 'Acciones',
-      render: (row) => this.renderActions(row)
-    }
+    { key: 'date', label: 'Fecha', sortable: true, render: (row) => this.renderDate(row) },
+    { key: 'startTime', label: 'Hora', sortable: true, class: 'w-24' },
+    { key: 'patientName', label: 'Paciente', sortable: true, render: (row) => this.renderPatient(row) },
+    { key: 'type', label: 'Tipo', sortable: true, render: (row) => this.renderType(row.type) },
+    { key: 'reason', label: 'Motivo', sortable: true },
+    { key: 'status', label: 'Estado', sortable: true, render: (row) => this.renderStatus(row.status) },
+    { key: 'actions', label: 'Acciones', render: (row) => this.renderActions(row) }
   ]);
 
   protected readonly tableConfig = {
     showPagination: true,
     pageSize: 15,
     showSearch: true,
-    searchPlaceholder: 'Buscar por paciente, motivo...'
+    searchPlaceholder: 'Buscar por paciente...'
   };
 
   // Options
@@ -178,70 +119,65 @@ export class Appointments implements OnInit {
 
   ngOnInit(): void {
     this.initFilterForm();
-    this.loadAppointments();
+    this.loadInitialData();
   }
 
   private initFilterForm(): void {
     this.filterForm = this.fb.group({
       status: ['all'],
       type: ['all'],
-      startDate: [''],
-      endDate: [''],
-      patientName: ['']
-    });
-
-    // Escuchar cambios en el formulario
-    this.filterForm.valueChanges.subscribe(() => {
-      // Los filtros se aplican automáticamente via computed
     });
   }
 
-  private loadAppointments(): void {
-    this.isLoading.set(true);
+  private loadInitialData(): void {
+    this.loadAppointments(); // Load all appointments initially
+    this.loadStats();
+  }
 
-    this.appointmentsService.getAll().subscribe({
-      next: (appointments) => {
-        this.appointments.set(appointments);
-        this.isLoading.set(false);
-      },
-      error: (error) => {
-        console.error('Error loading appointments:', error);
-        this.toastService.error('Error', 'No se pudieron cargar los turnos');
-        this.isLoading.set(false);
-      }
+  private loadAppointments(filters: Partial<AppointmentFilters> = {}): void {
+    const profId = this.professionalId();
+    if (!profId) return;
+
+    const finalFilters: AppointmentFilters = { professionalId: profId, ...filters };
+
+    this.isLoading.set(true);
+    this.appointmentsService.loadAll(finalFilters)
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        error: (error) => this.toastService.error('Error', 'No se pudieron cargar los turnos')
+      });
+  }
+
+  private loadStats(): void {
+    const profId = this.professionalId();
+    if (!profId) return;
+
+    this.appointmentsService.getStats(profId).subscribe({
+      next: (stats) => this.stats.set(stats),
+      error: (error) => this.toastService.error('Error', 'No se pudieron cargar las estadísticas')
     });
   }
 
   protected setDateFilter(filter: DateFilter): void {
     this.dateFilter.set(filter);
     const today = new Date();
+    let dateFilters: Partial<AppointmentFilters> = {};
 
     switch (filter) {
       case 'today':
-        this.filterForm.patchValue({
-          startDate: this.formatDate(startOfDay(today)),
-          endDate: this.formatDate(endOfDay(today))
-        });
+        dateFilters = { startDate: startOfDay(today), endDate: endOfDay(today) };
         break;
       case 'week':
-        this.filterForm.patchValue({
-          startDate: this.formatDate(startOfWeek(today, { weekStartsOn: 1 })),
-          endDate: this.formatDate(endOfWeek(today, { weekStartsOn: 1 }))
-        });
+        dateFilters = { startDate: startOfWeek(today, { weekStartsOn: 1 }), endDate: endOfWeek(today, { weekStartsOn: 1 }) };
         break;
       case 'month':
-        this.filterForm.patchValue({
-          startDate: this.formatDate(startOfMonth(today)),
-          endDate: this.formatDate(endOfMonth(today))
-        });
+        dateFilters = { startDate: startOfMonth(today), endDate: endOfMonth(today) };
         break;
       case 'all':
-        this.filterForm.patchValue({
-          startDate: '',
-          endDate: ''
-        });
+        dateFilters = {};
         break;
     }
+    this.loadAppointments(dateFilters);
   }
 
   protected openFilterModal(): void {
@@ -253,14 +189,8 @@ export class Appointments implements OnInit {
   }
 
   protected clearFilters(): void {
-    this.filterForm.reset({
-      status: 'all',
-      type: 'all',
-      startDate: '',
-      endDate: '',
-      patientName: ''
-    });
-    this.dateFilter.set('all');
+    this.filterForm.reset({ status: 'all', type: 'all' });
+    this.setDateFilter('all');
   }
 
   protected onRowClick(appointment: Appointment): void {
@@ -273,16 +203,21 @@ export class Appointments implements OnInit {
     this.selectedAppointment.set(null);
   }
 
+  private refreshData(): void {
+    // Reload appointments with the current date filter
+    this.setDateFilter(this.dateFilter());
+    this.loadStats();
+  }
+
+  // All other methods (confirm, cancel, etc.) remain the same but call refreshData()
+
   protected confirmAppointment(appointment: Appointment): void {
     this.appointmentsService.confirm(appointment.id).subscribe({
       next: () => {
         this.toastService.success('Turno confirmado', `Turno con ${appointment.patientName} confirmado`);
-        this.loadAppointments();
+        this.refreshData();
       },
-      error: (error) => {
-        console.error('Error confirming appointment:', error);
-        this.toastService.error('Error', 'No se pudo confirmar el turno');
-      }
+      error: (error) => this.handleError(error, 'confirmar')
     });
   }
 
@@ -290,13 +225,10 @@ export class Appointments implements OnInit {
     this.appointmentsService.update(appointment.id, { status: AppointmentStatus.IN_PROGRESS }).subscribe({
       next: () => {
         this.toastService.info('Turno iniciado', 'El turno está en curso');
-        this.loadAppointments();
+        this.refreshData();
         this.closeDetailModal();
       },
-      error: (error) => {
-        console.error('Error starting appointment:', error);
-        this.toastService.error('Error', 'No se pudo iniciar el turno');
-      }
+      error: (error) => this.handleError(error, 'iniciar')
     });
   }
 
@@ -304,15 +236,11 @@ export class Appointments implements OnInit {
     this.appointmentsService.update(appointment.id, { status: AppointmentStatus.COMPLETED }).subscribe({
       next: () => {
         this.toastService.success('Turno completado', 'El turno se completó correctamente');
-        this.loadAppointments();
+        this.refreshData();
         this.closeDetailModal();
-        // Redirigir al detalle del paciente donde se puede agregar registro médico
         this.router.navigate(['/professional/patients', appointment.patientId]);
       },
-      error: (error) => {
-        console.error('Error completing appointment:', error);
-        this.toastService.error('Error', 'No se pudo completar el turno');
-      }
+      error: (error) => this.handleError(error, 'completar')
     });
   }
 
@@ -323,13 +251,10 @@ export class Appointments implements OnInit {
     this.appointmentsService.cancel(appointment.id, reason).subscribe({
       next: () => {
         this.toastService.warning('Turno cancelado', `Turno con ${appointment.patientName} cancelado`);
-        this.loadAppointments();
+        this.refreshData();
         this.closeDetailModal();
       },
-      error: (error) => {
-        console.error('Error canceling appointment:', error);
-        this.toastService.error('Error', 'No se pudo cancelar el turno');
-      }
+      error: (error) => this.handleError(error, 'cancelar')
     });
   }
 
@@ -338,13 +263,10 @@ export class Appointments implements OnInit {
       this.appointmentsService.update(appointment.id, { status: AppointmentStatus.NO_SHOW }).subscribe({
         next: () => {
           this.toastService.warning('Marcado como no asistió', 'El turno se marcó como no asistió');
-          this.loadAppointments();
+          this.refreshData();
           this.closeDetailModal();
         },
-        error: (error) => {
-          console.error('Error marking no show:', error);
-          this.toastService.error('Error', 'No se pudo actualizar el turno');
-        }
+        error: (error) => this.handleError(error, 'actualizar')
       });
     }
   }
@@ -353,9 +275,6 @@ export class Appointments implements OnInit {
     this.router.navigate(['/professional/patients', patientId]);
   }
 
-  /**
-   * Habilitar edición de observaciones clínicas
-   */
   protected enableEditObservations(): void {
     const appointment = this.selectedAppointment();
     if (appointment) {
@@ -364,17 +283,11 @@ export class Appointments implements OnInit {
     }
   }
 
-  /**
-   * Cancelar edición de observaciones
-   */
   protected cancelEditObservations(): void {
     this.isEditingObservations.set(false);
     this.tempObservations = '';
   }
 
-  /**
-   * Guardar observaciones clínicas
-   */
   protected saveObservations(): void {
     const appointment = this.selectedAppointment();
     if (!appointment) return;
@@ -384,32 +297,29 @@ export class Appointments implements OnInit {
     this.appointmentsService.update(appointment.id, { observations }).subscribe({
       next: () => {
         this.toastService.success('Guardado', 'Observaciones clínicas guardadas correctamente');
-        this.loadAppointments();
+        this.refreshData();
         this.isEditingObservations.set(false);
         this.tempObservations = '';
-        // Actualizar el appointment seleccionado
         this.selectedAppointment.update(apt => apt ? { ...apt, observations } : null);
       },
-      error: (error) => {
-        console.error('Error saving observations:', error);
-        this.toastService.error('Error', 'No se pudieron guardar las observaciones');
-      }
+      error: (error) => this.handleError(error, 'guardar las observaciones')
     });
   }
 
   protected exportToCSV(): void {
     this.toastService.info('Exportando', 'Generando archivo CSV...');
-    // Implementación de exportación
+    // TODO: Implementación de exportación
+  }
+
+  private handleError(error: any, action: string): void {
+    console.error(`Error ${action} appointment:`, error);
+    this.toastService.error('Error', `No se pudo ${action} el turno`);
   }
 
   // Render methods
   private renderDate(row: Appointment): string {
     const date = new Date(row.date);
-    const dateStr = date.toLocaleDateString('es-AR', { 
-      weekday: 'short', 
-      day: '2-digit', 
-      month: 'short' 
-    });
+    const dateStr = date.toLocaleDateString('es-AR', { weekday: 'short', day: '2-digit', month: 'short' });
     return `<span class="font-medium">${dateStr}</span>`;
   }
 
@@ -451,29 +361,10 @@ export class Appointments implements OnInit {
   }
 
   private renderActions(row: Appointment): string {
-    if (row.status === 'scheduled' || row.status === 'confirmed') {
-      return `
-        <button 
-          class="text-sm text-primary-600 hover:text-primary-800 font-medium"
-          onclick="event.stopPropagation()"
-        >
-          Ver detalles
-        </button>
-      `;
-    }
-    return '-';
+    return `<button class="text-sm text-primary-600 hover:text-primary-800 font-medium">Ver detalles</button>`;
   }
 
   private getInitials(name: string): string {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .slice(0, 2)
-      .join('')
-      .toUpperCase();
-  }
-
-  private formatDate(date: Date): string {
-    return date.toISOString().split('T')[0];
+    return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
   }
 }

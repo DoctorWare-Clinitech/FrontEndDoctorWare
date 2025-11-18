@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PatientsService } from '../../../core/services/patients.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { Patient, PatientFilters } from '../../../core/models';
 import { DateFormatPipe } from '../../../shared/pipes';
 import { Modal } from '../../../shared/components/modal/modal';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-patients',
@@ -19,7 +21,11 @@ import { Modal } from '../../../shared/components/modal/modal';
 export class Patients implements OnInit {
   private readonly router = inject(Router);
   private readonly patientsService = inject(PatientsService);
+  private readonly authService = inject(AuthService);
   private readonly toastService = inject(ToastService);
+
+  // Current User
+  protected readonly currentUser = toSignal(this.authService.currentUser$);
 
   // State
   protected readonly isLoading = signal(true);
@@ -53,12 +59,26 @@ export class Patients implements OnInit {
   }
 
   /**
-   * Cargar lista de pacientes
+   * Cargar lista de pacientes del profesional logueado
    */
   private loadPatients(): void {
     this.isLoading.set(true);
 
-    this.patientsService.getAll().subscribe({
+    const professionalUserId = this.currentUser()?.id;
+
+    if (!professionalUserId) {
+      this.toastService.error('Error', 'No se pudo obtener el ID del profesional');
+      this.isLoading.set(false);
+      return;
+    }
+
+    // Filtrar pacientes por profesional logueado
+    const filters: PatientFilters = {
+      professionalId: professionalUserId,
+      isActive: true
+    };
+
+    this.patientsService.getAll(filters).subscribe({
       next: (patients) => {
         this.patients.set(patients);
         this.isLoading.set(false);

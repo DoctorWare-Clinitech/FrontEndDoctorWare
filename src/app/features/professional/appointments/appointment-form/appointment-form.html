@@ -1,0 +1,128 @@
+<div class="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <a [routerLink]="['/professional/appointments']" class="inline-flex items-center text-sm font-medium text-gray-600 hover:text-primary-600 mb-4">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+      Volver a la lista de turnos
+    </a>
+    <h1 class="text-3xl font-bold text-gray-900">Nuevo Turno</h1>
+    <p class="text-gray-600 mt-1">Complete los datos para agendar una nueva consulta.</p>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="card text-center py-12">
+      <div class="spinner"></div>
+      <p class="mt-4 text-gray-600">Cargando datos necesarios...</p>
+    </div>
+  }
+
+  <!-- Form -->
+  @if (!isLoading()) {
+    <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()" class="space-y-8">
+
+      <!-- Patient Selection -->
+      <div class="card p-6">
+        <h2 class="section-title">1. Paciente</h2>
+        <div class="form-group mt-4">
+          <label for="patientId" class="label">Seleccionar Paciente <span class="required">*</span></label>
+          <select id="patientId" formControlName="patientId" class="input" [class.error]="hasError('patientId')">
+            <option value="" disabled>-- Seleccione un paciente --</option>
+            @for (patient of patients(); track patient.id) {
+              <option [value]="patient.id">{{ patient.name }} - DNI: {{ patient.dni }}</option>
+            }
+          </select>
+          @if (hasError('patientId')) { <span class="error-message">{{ getErrorMessage('patientId') }}</span> }
+
+          @if (selectedPatient(); as patient) {
+            <div class="card-light mt-4">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                <div><span class="label-small">Email:</span><span class="value ml-2">{{ patient.email || 'N/A' }}</span></div>
+                <div><span class="label-small">Teléfono:</span><span class="value ml-2">{{ patient.phone }}</span></div>
+                <div><span class="label-small">Edad:</span><span class="value ml-2">{{ getPatientAge(patient) }} años</span></div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Date and Time -->
+      <div class="card p-6">
+        <h2 class="section-title">2. Fecha y Hora</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+          <div class="form-group">
+            <label for="date" class="label">Fecha <span class="required">*</span></label>
+            <input type="date" id="date" formControlName="date" class="input" [class.error]="hasError('date')">
+            @if (hasError('date')) { <span class="error-message">{{ getErrorMessage('date') }}</span> }
+          </div>
+
+          <div class="form-group">
+            <label for="startTime" class="label">Hora de inicio <span class="required">*</span></label>
+            <select id="startTime" formControlName="startTime" class="input" [class.error]="hasError('startTime')">
+              @if (isLoadingTimes()) {
+                <option value="" disabled>Cargando horarios...</option>
+              } @else if (availableTimes().length > 0) {
+                <option value="" disabled>-- Seleccione un horario --</option>
+                @for (slot of availableTimes(); track slot.time) {
+                  <option [value]="slot.time">{{ slot.time }}</option>
+                }
+              } @else {
+                <option value="" disabled>No hay horarios disponibles</option>
+              }
+            </select>
+            @if (hasError('startTime')) { <span class="error-message">{{ getErrorMessage('startTime') }}</span> }
+          </div>
+
+          <div class="form-group">
+            <label for="duration" class="label">Duración <span class="required">*</span></label>
+            <select id="duration" formControlName="duration" class="input" [class.error]="hasError('duration')">
+              @for (option of durationOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+            @if (hasError('duration')) { <span class="error-message">{{ getErrorMessage('duration') }}</span> }
+          </div>
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div class="card p-6">
+        <h2 class="section-title">3. Detalles de la Consulta</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+          <div class="form-group">
+            <label for="type" class="label">Tipo <span class="required">*</span></label>
+            <select id="type" formControlName="type" class="input" [class.error]="hasError('type')">
+              @for (option of typeOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+            @if (hasError('type')) { <span class="error-message">{{ getErrorMessage('type') }}</span> }
+          </div>
+
+          <div class="form-group">
+            <label for="reason" class="label">Motivo de la consulta</label>
+            <input type="text" id="reason" formControlName="reason" class="input" placeholder="Ej: Dolor de cabeza persistente">
+          </div>
+
+          <div class="form-group md:col-span-2">
+            <label for="notes" class="label">Notas adicionales</label>
+            <textarea id="notes" formControlName="notes" class="textarea" rows="4" placeholder="Información adicional relevante para el turno..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-end gap-4 pt-4">
+        <button type="button" (click)="cancel()" class="btn btn-secondary-outline" [disabled]="isSaving()">Cancelar</button>
+        <button type="submit" class="btn btn-primary" [disabled]="isSaving() || appointmentForm.invalid">
+          @if (isSaving()) {
+            <span class="btn-spinner"></span>
+            <span>Guardando...</span>
+          } @else {
+            <span>Crear Turno</span>
+          }
+        </button>
+      </div>
+    </form>
+  }
+</div>

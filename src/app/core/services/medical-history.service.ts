@@ -10,7 +10,7 @@ import { MedicalHistory, Diagnosis, Allergy, Medication } from '../models';
 export interface CreateMedicalHistoryDto {
   patientId: string;
   type: string;
-  date: Date;
+  date: Date | string;
   title: string;
   description: string;
   diagnosis?: string;

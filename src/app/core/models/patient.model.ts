@@ -86,6 +86,7 @@ export interface Patient {
 
 /**
  * Datos para crear paciente
+ * DEBE coincidir EXACTAMENTE con CreatePatientRequest del backend
  */
 export interface CreatePatientDto {
   name: string;
@@ -103,7 +104,8 @@ export interface CreatePatientDto {
   };
   emergencyContact: EmergencyContact;
   medicalInsurance?: MedicalInsurance;
-  professionalId: string;
+  professionalId: string;  // userId del profesional (será resuelto por ProfessionalResolver en backend)
+  notes?: string;           // Notas generales del paciente
 }
 
 /**

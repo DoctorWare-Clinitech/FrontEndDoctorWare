@@ -126,6 +126,7 @@ export interface CreateMedicalHistoryDto {
   patientId: string;
   appointmentId?: string;
   type: MedicalRecordType;
+  date?: Date | string; // Added date property
   title: string;
   description: string;
   diagnosis?: string;

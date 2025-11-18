@@ -166,6 +166,7 @@ export class PatientForm implements OnInit {
 
   /**
    * Crear nuevo paciente
+   * IMPORTANTE: El payload DEBE coincidir EXACTAMENTE con CreatePatientRequest del backend
    */
   private createPatient(): void {
     const currentUser = this.authService.getCurrentUser();
@@ -176,17 +177,36 @@ export class PatientForm implements OnInit {
     }
 
     const formValue = this.patientForm.value;
+
+    // Construir DTO EXACTO como lo requiere el backend
     const dto: CreatePatientDto = {
-      name: formValue.name,
-      email: formValue.email,
+      name: formValue.name,                    // Backend split en NOMBRE y APELLIDO
+      email: formValue.email || null,
       phone: formValue.phone,
       dni: formValue.dni,
       dateOfBirth: formValue.dateOfBirth,
-      gender: formValue.gender,
-      address: formValue.address,
-      emergencyContact: formValue.emergencyContact,
-      medicalInsurance: formValue.hasMedicalInsurance ? formValue.medicalInsurance : undefined,
-      professionalId: currentUser.id
+      gender: formValue.gender,                // Backend mapea: male→Masculino, female→Femenino
+      address: {
+        street: formValue.address.street,
+        city: formValue.address.city,
+        state: formValue.address.state,
+        zipCode: formValue.address.zipCode,
+        country: formValue.address.country
+      },
+      emergencyContact: {
+        name: formValue.emergencyContact.name,
+        phone: formValue.emergencyContact.phone,
+        relationship: formValue.emergencyContact.relationship,
+        email: formValue.emergencyContact.email || undefined
+      },
+      medicalInsurance: formValue.hasMedicalInsurance ? {
+        provider: formValue.medicalInsurance.provider,
+        planName: formValue.medicalInsurance.planName,
+        memberNumber: formValue.medicalInsurance.memberNumber,
+        validUntil: formValue.medicalInsurance.validUntil || undefined
+      } : undefined,
+      professionalId: currentUser.id,          // userId del profesional → será resuelto por ProfessionalResolver
+      notes: formValue.notes || undefined      // Notas generales (serán encriptadas en backend)
     };
 
     this.patientsService.create(dto).subscribe({
@@ -197,7 +217,8 @@ export class PatientForm implements OnInit {
       },
       error: (error) => {
         console.error('Error creating patient:', error);
-        this.toastService.error('Error', 'No se pudo crear el paciente');
+        const errorMsg = error.error?.message || error.message || 'No se pudo crear el paciente';
+        this.toastService.error('Error', errorMsg);
         this.isLoading.set(false);
       }
     });

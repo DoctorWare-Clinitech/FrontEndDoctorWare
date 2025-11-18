@@ -19,23 +19,11 @@ export const PROFESSIONAL_ROUTES: Routes = [
         children: [
           {
             path: '',
-            loadComponent: () => import('./components/appointments-list/appointments-list.component').then(m => m.AppointmentsListComponent)
-          },
-          {
-            path: 'calendar',
-            loadComponent: () => import('./components/appointments-calendar/appointments-calendar.component').then(m => m.AppointmentsCalendarComponent)
+            loadComponent: () => import('./appointments/appointments').then(m => m.Appointments)
           },
           {
             path: 'new',
-            loadComponent: () => import('./components/appointment-form/appointment-form.component').then(m => m.AppointmentFormComponent)
-          },
-          {
-            path: ':id',
-            loadComponent: () => import('./components/appointment-detail/appointment-detail.component').then(m => m.AppointmentDetailComponent)
-          },
-          {
-            path: ':id/edit',
-            loadComponent: () => import('./components/appointment-form/appointment-form.component').then(m => m.AppointmentFormComponent)
+            loadComponent: () => import('./appointments/appointment-form/appointment-form').then(m => m.AppointmentForm)
           }
         ]
       },
