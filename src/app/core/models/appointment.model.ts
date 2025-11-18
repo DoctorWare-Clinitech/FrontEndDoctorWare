@@ -49,16 +49,17 @@ export interface Appointment {
 
 /**
  * Datos para crear un turno
+ * DEBE coincidir EXACTAMENTE con CreateAppointmentRequest del backend
  */
 export interface CreateAppointmentDto {
-  patientId: string;
-  professionalId: string;
-  date: Date;
-  startTime: string;
-  duration: number;
-  type: AppointmentType;
-  reason?: string;
-  notes?: string;
+  patientId: string;           // ID_PACIENTES (string)
+  professionalId: string;      // USUARIOS.ID_USUARIOS (string) → backend lo resuelve a PROFESIONALES
+  date: Date | string;         // DateTime - Acepta Date o string ISO
+  startTime: string;           // Formato "HH:mm" (ej: "14:30")
+  duration: number;            // Duración en minutos
+  type: string;                // Tipo de consulta (default: "first_visit")
+  reason?: string;             // Motivo de la consulta (opcional)
+  notes?: string;              // Notas adicionales (opcional)
 }
 
 /**
@@ -67,6 +68,7 @@ export interface CreateAppointmentDto {
 export interface UpdateAppointmentDto {
   date?: Date;
   startTime?: string;
+  endTime?: string;
   duration?: number;
   status?: AppointmentStatus;
   type?: AppointmentType;
@@ -85,16 +87,6 @@ export interface AppointmentFilters {
   startDate?: Date;
   endDate?: Date;
   type?: AppointmentType;
-}
-
-/**
- * Horario disponible
- */
-export interface AvailableSlot {
-  date: Date;
-  startTime: string;
-  endTime: string;
-  available: boolean;
 }
 
 /**

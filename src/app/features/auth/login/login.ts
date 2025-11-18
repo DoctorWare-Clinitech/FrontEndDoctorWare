@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-
+import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -16,11 +17,21 @@ export class Login implements OnInit {
   isLoading = false;
   errorMessage = '';
   showPassword = false;
+  private isBrowser: boolean;
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router,
+    private toastr: ToastrService,
+    @Inject(PLATFORM_ID) platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
 
   ngOnInit(): void {
     this.initForm();
+    this.loadRememberedEmail();
   }
 
   private initForm(): void {
@@ -29,6 +40,18 @@ export class Login implements OnInit {
       password: ['', [Validators.required, Validators.minLength(6)]],
       rememberMe: [false],
     });
+  }
+
+  private loadRememberedEmail(): void {
+    if (!this.isBrowser) return; // Solo ejecutar en el navegador
+
+    const rememberedEmail = localStorage.getItem('rememberedEmail');
+    if (rememberedEmail) {
+      this.loginForm.patchValue({
+        email: rememberedEmail,
+        rememberMe: true
+      });
+    }
   }
 
   get email() {
@@ -46,13 +69,14 @@ export class Login implements OnInit {
   onSubmit(): void {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
+      this.toastr.warning('Por favor completa todos los campos correctamente', 'Formulario incompleto');
       return;
     }
 
     this.isLoading = true;
     this.errorMessage = '';
 
-    const { email, password } = this.loginForm.value;
+    const { email, password, rememberMe } = this.loginForm.value;
 
     console.log('🔐 Attempting login...', { email });
 
@@ -60,15 +84,24 @@ export class Login implements OnInit {
       next: (response) => {
         console.log('✅ Login response:', response);
         this.isLoading = false;
+
+        // Guardar o eliminar email según el checkbox "Recuérdame" (solo en navegador)
+        if (this.isBrowser) {
+          if (rememberMe) {
+            localStorage.setItem('rememberedEmail', email);
+          } else {
+            localStorage.removeItem('rememberedEmail');
+          }
+        }
+
+        this.toastr.success('Has iniciado sesión exitosamente', 'Bienvenido');
         // La redirección se maneja en AuthService
       },
       error: (error) => {
         console.error('❌ Login error:', error);
         this.isLoading = false;
-        this.errorMessage =
-          error.error?.message ||
-          error.message ||
-          'Error al iniciar sesión. Verifica tus credenciales.';
+        const errorMsg = error.error?.message || error.message || 'Error al iniciar sesión. Verifica tus credenciales.';
+        this.toastr.error(errorMsg, 'Error de autenticación');
       },
     });
   }

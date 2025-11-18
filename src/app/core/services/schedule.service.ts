@@ -2,38 +2,16 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-
-export interface TimeSlot {
-  id: string;
-  dayOfWeek: number; // 0 = Domingo, 1 = Lunes, etc.
-  startTime: string; // "09:00"
-  endTime: string; // "17:00"
-  duration: number; // minutos por consulta
-  isActive: boolean;
-}
-
-export interface BlockedSlot {
-  id: string;
-  date: Date;
-  startTime: string;
-  endTime: string;
-  reason: string;
-  createdAt: Date;
-}
-
-export interface ScheduleConfig {
-  professionalId: string;
-  timeSlots: TimeSlot[];
-  blockedSlots: BlockedSlot[];
-  consultationDuration: number; // duración por defecto en minutos
-}
-
-export interface AvailableSlot {
-  date: Date;
-  time: string;
-  available: boolean;
-  appointmentId?: string;
-}
+import {
+  TimeSlot,
+  BlockedSlot,
+  ScheduleConfig,
+  AvailableSlot,
+  CreateTimeSlotDto,
+  UpdateTimeSlotDto,
+  CreateBlockedSlotDto,
+  UpdateScheduleConfigDto
+} from '../models/schedule.model';
 
 @Injectable({
   providedIn: 'root'
@@ -57,7 +35,7 @@ export class ScheduleService {
   /**
    * Actualizar configuración de agenda
    */
-  updateConfig(professionalId: string, config: Partial<ScheduleConfig>): Observable<ScheduleConfig> {
+  updateConfig(professionalId: string, config: UpdateScheduleConfigDto): Observable<ScheduleConfig> {
     return this.http.put<ScheduleConfig>(`${this.API_URL}/${professionalId}`, config).pipe(
       tap(updated => this.scheduleConfig.set(updated))
     );
@@ -66,14 +44,14 @@ export class ScheduleService {
   /**
    * Agregar horario disponible
    */
-  addTimeSlot(professionalId: string, slot: Omit<TimeSlot, 'id'>): Observable<TimeSlot> {
+  addTimeSlot(professionalId: string, slot: CreateTimeSlotDto): Observable<TimeSlot> {
     return this.http.post<TimeSlot>(`${this.API_URL}/${professionalId}/slots`, slot);
   }
 
   /**
    * Actualizar horario disponible
    */
-  updateTimeSlot(professionalId: string, slotId: string, slot: Partial<TimeSlot>): Observable<TimeSlot> {
+  updateTimeSlot(professionalId: string, slotId: string, slot: UpdateTimeSlotDto): Observable<TimeSlot> {
     return this.http.put<TimeSlot>(`${this.API_URL}/${professionalId}/slots/${slotId}`, slot);
   }
 
@@ -87,7 +65,7 @@ export class ScheduleService {
   /**
    * Bloquear horario
    */
-  blockSlot(professionalId: string, block: Omit<BlockedSlot, 'id' | 'createdAt'>): Observable<BlockedSlot> {
+  blockSlot(professionalId: string, block: CreateBlockedSlotDto): Observable<BlockedSlot> {
     return this.http.post<BlockedSlot>(`${this.API_URL}/${professionalId}/blocks`, block);
   }
 

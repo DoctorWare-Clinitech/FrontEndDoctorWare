@@ -1,0 +1,208 @@
+<div class="appointment-form-container">
+  <!-- Header -->
+  <div class="header">
+    <h1 class="title">
+      {{ isEditMode ? 'Editar Turno' : 'Nuevo Turno' }}
+    </h1>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p class="loading-text">Cargando turno...</p>
+  </div>
+
+  <!-- Error Alert -->
+  <div *ngIf="error" class="alert alert-error">
+    <svg class="alert-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <span>{{ error }}</span>
+  </div>
+
+  <!-- Formulario -->
+  <form *ngIf="!loading" [formGroup]="appointmentForm" (ngSubmit)="onSubmit()" class="appointment-form">
+    <div class="form-section">
+      <h2 class="section-title">Información del Turno</h2>
+
+      <div class="form-grid">
+        <!-- Patient ID -->
+        <div class="form-group">
+          <label for="patientId" class="form-label">
+            Paciente <span class="required">*</span>
+          </label>
+          <input
+            id="patientId"
+            type="text"
+            class="form-input"
+            formControlName="patientId"
+            placeholder="ID del paciente"
+            [class.error]="showError('patientId')"
+          />
+          <span *ngIf="showError('patientId')" class="error-message">
+            {{ getErrorMessage('patientId') }}
+          </span>
+          <span class="form-hint">Ingrese el ID del paciente</span>
+        </div>
+
+        <!-- Professional ID -->
+        <div class="form-group">
+          <label for="professionalId" class="form-label">
+            Profesional <span class="required">*</span>
+          </label>
+          <input
+            id="professionalId"
+            type="text"
+            class="form-input"
+            formControlName="professionalId"
+            placeholder="ID del profesional"
+            [class.error]="showError('professionalId')"
+          />
+          <span *ngIf="showError('professionalId')" class="error-message">
+            {{ getErrorMessage('professionalId') }}
+          </span>
+          <span class="form-hint">Ingrese el ID del profesional</span>
+        </div>
+
+        <!-- Date -->
+        <div class="form-group">
+          <label for="date" class="form-label">
+            Fecha <span class="required">*</span>
+          </label>
+          <input
+            id="date"
+            type="date"
+            class="form-input"
+            formControlName="date"
+            [class.error]="showError('date')"
+          />
+          <span *ngIf="showError('date')" class="error-message">
+            {{ getErrorMessage('date') }}
+          </span>
+        </div>
+
+        <!-- Start Time -->
+        <div class="form-group">
+          <label for="startTime" class="form-label">
+            Hora de inicio <span class="required">*</span>
+          </label>
+          <input
+            id="startTime"
+            type="time"
+            class="form-input"
+            formControlName="startTime"
+            [class.error]="showError('startTime')"
+          />
+          <span *ngIf="showError('startTime')" class="error-message">
+            {{ getErrorMessage('startTime') }}
+          </span>
+        </div>
+
+        <!-- Duration -->
+        <div class="form-group">
+          <label for="duration" class="form-label">
+            Duración <span class="required">*</span>
+          </label>
+          <select
+            id="duration"
+            class="form-select"
+            formControlName="duration"
+            [class.error]="showError('duration')"
+          >
+            <option *ngFor="let option of durationOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+          <span *ngIf="showError('duration')" class="error-message">
+            {{ getErrorMessage('duration') }}
+          </span>
+        </div>
+
+        <!-- Type -->
+        <div class="form-group">
+          <label for="type" class="form-label">
+            Tipo de consulta <span class="required">*</span>
+          </label>
+          <select
+            id="type"
+            class="form-select"
+            formControlName="type"
+            [class.error]="showError('type')"
+          >
+            <option *ngFor="let option of typeOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
+          </select>
+          <span *ngIf="showError('type')" class="error-message">
+            {{ getErrorMessage('type') }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2 class="section-title">Detalles Adicionales</h2>
+
+      <div class="form-grid">
+        <!-- Reason -->
+        <div class="form-group full-width">
+          <label for="reason" class="form-label">Motivo de consulta</label>
+          <textarea
+            id="reason"
+            class="form-textarea"
+            formControlName="reason"
+            rows="3"
+            placeholder="Describa brevemente el motivo de la consulta..."
+            [class.error]="showError('reason')"
+          ></textarea>
+          <span *ngIf="showError('reason')" class="error-message">
+            {{ getErrorMessage('reason') }}
+          </span>
+          <span class="form-hint">Máximo 500 caracteres</span>
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group full-width">
+          <label for="notes" class="form-label">Notas internas</label>
+          <textarea
+            id="notes"
+            class="form-textarea"
+            formControlName="notes"
+            rows="4"
+            placeholder="Agregue notas adicionales para uso interno..."
+            [class.error]="showError('notes')"
+          ></textarea>
+          <span *ngIf="showError('notes')" class="error-message">
+            {{ getErrorMessage('notes') }}
+          </span>
+          <span class="form-hint">Máximo 1000 caracteres</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="onCancel()"
+        [disabled]="saving"
+      >
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="saving || appointmentForm.invalid"
+      >
+        <span *ngIf="!saving">
+          {{ isEditMode ? 'Actualizar Turno' : 'Crear Turno' }}
+        </span>
+        <span *ngIf="saving" class="saving-text">
+          <div class="spinner-small"></div>
+          {{ isEditMode ? 'Actualizando...' : 'Creando...' }}
+        </span>
+      </button>
+    </div>
+  </form>
+</div>

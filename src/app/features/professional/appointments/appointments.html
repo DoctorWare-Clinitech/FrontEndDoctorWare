@@ -1,61 +1,52 @@
 <!-- src/app/features/professional/appointments/appointments.html -->
-
 <div class="space-y-6">
   
   <!-- Header -->
-  <div class="flex items-center justify-between">
+  <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
     <div>
       <h1 class="text-3xl font-bold text-gray-900">Gestión de Turnos</h1>
       <p class="text-gray-600 mt-1">Administra todos tus turnos y consultas</p>
     </div>
 
-    <div class="flex items-center gap-3">
-      <button
-        type="button"
-        (click)="exportToCSV()"
-        class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
-      >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
+    <div class="flex items-center gap-3 flex-wrap">
+      <button type="button" (click)="exportToCSV()" class="btn btn-secondary-outline">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
         Exportar
       </button>
-      <button
-        type="button"
-        (click)="openFilterModal()"
-        class="btn-secondary"
-      >
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-        </svg>
-        Filtros Avanzados
+      <button type="button" (click)="openFilterModal()" class="btn btn-secondary-outline">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
+        Filtros
       </button>
+      <a [routerLink]="['/professional/appointments/new']" class="btn btn-primary">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+        Nuevo Turno
+      </a>
     </div>
   </div>
 
   <!-- Stats Cards -->
-  <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
-    <div class="card text-center">
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+    <div class="card text-center p-4">
       <p class="text-sm text-gray-600">Total</p>
       <p class="text-2xl font-bold text-gray-900 mt-1">{{ stats().total }}</p>
     </div>
-    <div class="card text-center">
+    <div class="card text-center p-4">
       <p class="text-sm text-gray-600">Agendados</p>
       <p class="text-2xl font-bold text-blue-600 mt-1">{{ stats().scheduled }}</p>
     </div>
-    <div class="card text-center">
+    <div class="card text-center p-4">
       <p class="text-sm text-gray-600">Confirmados</p>
       <p class="text-2xl font-bold text-green-600 mt-1">{{ stats().confirmed }}</p>
     </div>
-    <div class="card text-center">
+    <div class="card text-center p-4">
       <p class="text-sm text-gray-600">Completados</p>
       <p class="text-2xl font-bold text-gray-600 mt-1">{{ stats().completed }}</p>
     </div>
-    <div class="card text-center">
+    <div class="card text-center p-4">
       <p class="text-sm text-gray-600">Cancelados</p>
       <p class="text-2xl font-bold text-red-600 mt-1">{{ stats().cancelled }}</p>
     </div>
-    <div class="card text-center">
+    <div class="card text-center p-4">
       <p class="text-sm text-gray-600">No asistió</p>
       <p class="text-2xl font-bold text-yellow-600 mt-1">{{ stats().noShow }}</p>
     </div>
@@ -64,61 +55,20 @@
   <!-- Quick Filters -->
   <div class="flex items-center gap-2 flex-wrap">
     <span class="text-sm font-medium text-gray-700">Filtro rápido:</span>
-    <button
-      type="button"
-      (click)="setDateFilter('all')"
-      [class.bg-primary-100]="dateFilter() === 'all'"
-      [class.text-primary-700]="dateFilter() === 'all'"
-      class="px-3 py-1 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
-    >
-      Todos
-    </button>
-    <button
-      type="button"
-      (click)="setDateFilter('today')"
-      [class.bg-primary-100]="dateFilter() === 'today'"
-      [class.text-primary-700]="dateFilter() === 'today'"
-      class="px-3 py-1 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
-    >
-      Hoy
-    </button>
-    <button
-      type="button"
-      (click)="setDateFilter('week')"
-      [class.bg-primary-100]="dateFilter() === 'week'"
-      [class.text-primary-700]="dateFilter() === 'week'"
-      class="px-3 py-1 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
-    >
-      Esta semana
-    </button>
-    <button
-      type="button"
-      (click)="setDateFilter('month')"
-      [class.bg-primary-100]="dateFilter() === 'month'"
-      [class.text-primary-700]="dateFilter() === 'month'"
-      class="px-3 py-1 text-sm rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
-    >
-      Este mes
-    </button>
+    <button type="button" (click)="setDateFilter('all')" [class.bg-primary-100]="dateFilter() === 'all'" [class.text-primary-700]="dateFilter() === 'all'" class="btn-filter">Todos</button>
+    <button type="button" (click)="setDateFilter('today')" [class.bg-primary-100]="dateFilter() === 'today'" [class.text-primary-700]="dateFilter() === 'today'" class="btn-filter">Hoy</button>
+    <button type="button" (click)="setDateFilter('week')" [class.bg-primary-100]="dateFilter() === 'week'" [class.text-primary-700]="dateFilter() === 'week'" class="btn-filter">Esta semana</button>
+    <button type="button" (click)="setDateFilter('month')" [class.bg-primary-100]="dateFilter() === 'month'" [class.text-primary-700]="dateFilter() === 'month'" class="btn-filter">Este mes</button>
     
-    @if (filterForm.value.status !== 'all' || filterForm.value.type !== 'all' || filterForm.value.patientName) {
-      <button
-        type="button"
-        (click)="clearFilters()"
-        class="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-      >
-        Limpiar filtros
-      </button>
+    @if (filterForm.dirty) {
+      <button type="button" (click)="clearFilters()" class="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">Limpiar filtros</button>
     }
   </div>
 
   <!-- Table -->
   <div class="card">
     @if (isLoading()) {
-      <div class="text-center py-12">
-        <div class="inline-block w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
-        <p class="mt-4 text-gray-600">Cargando turnos...</p>
-      </div>
+      <div class="text-center py-12"><div class="spinner"></div><p class="mt-4 text-gray-600">Cargando turnos...</p></div>
     } @else {
       <app-table
         [data]="filteredAppointments()"
@@ -130,290 +80,122 @@
   </div>
 
   <!-- Modal: Filtros Avanzados -->
-  <app-modal
-    [isOpen]="showFilterModal()"
-    (closed)="closeFilterModal()"
-    title="Filtros Avanzados"
-    size="lg"
-    [showFooter]="true"
-  >
+  <app-modal [isOpen]="showFilterModal()" (closed)="closeFilterModal()" title="Filtros Avanzados" size="lg" [showFooter]="true">
     <form [formGroup]="filterForm" class="space-y-4">
-      
-      <!-- Estado y Tipo -->
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
-            Estado
-          </label>
-          <select
-            formControlName="status"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          >
+          <label class="label">Estado</label>
+          <select formControlName="status" class="input">
             @for (option of statusOptions; track option.value) {
               <option [value]="option.value">{{ option.label }}</option>
             }
           </select>
         </div>
-
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
-            Tipo de consulta
-          </label>
-          <select
-            formControlName="type"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          >
+          <label class="label">Tipo de consulta</label>
+          <select formControlName="type" class="input">
             @for (option of typeOptions; track option.value) {
               <option [value]="option.value">{{ option.label }}</option>
             }
           </select>
         </div>
       </div>
-
-      <!-- Rango de fechas -->
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
-            Fecha desde
-          </label>
-          <input
-            type="date"
-            formControlName="startDate"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
-            Fecha hasta
-          </label>
-          <input
-            type="date"
-            formControlName="endDate"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          />
-        </div>
-      </div>
-
-      <!-- Paciente -->
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">
-          Buscar por paciente
-        </label>
-        <input
-          type="text"
-          formControlName="patientName"
-          placeholder="Nombre del paciente"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-        />
-      </div>
     </form>
-
     <div footer class="flex gap-3">
-      <button
-        type="button"
-        (click)="clearFilters(); closeFilterModal()"
-        class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-      >
-        Limpiar
-      </button>
-      <button
-        type="button"
-        (click)="closeFilterModal()"
-        class="btn-primary"
-      >
-        Aplicar Filtros
-      </button>
+      <button type="button" (click)="clearFilters(); closeFilterModal()" class="btn btn-secondary-outline">Limpiar</button>
+      <button type="button" (click)="closeFilterModal()" class="btn btn-primary">Aplicar Filtros</button>
     </div>
   </app-modal>
 
   <!-- Modal: Detalle del Turno -->
-  <app-modal
-    [isOpen]="showDetailModal()"
-    (closed)="closeDetailModal()"
-    [title]="'Turno - ' + (selectedAppointment()?.patientName || '')"
-    size="lg"
-    [showFooter]="true"
-  >
+  <app-modal [isOpen]="showDetailModal()" (closed)="closeDetailModal()" [title]="'Turno - ' + (selectedAppointment()?.patientName || '')" size="xl" [showFooter]="true">
     @if (selectedAppointment(); as apt) {
       <div class="space-y-6">
-        
-        <!-- Información del paciente -->
+        <!-- Patient Info -->
         <div>
-          <h3 class="text-lg font-semibold text-gray-900 mb-3">Información del Paciente</h3>
-          <div class="bg-gray-50 rounded-lg p-4 space-y-2">
+          <h3 class="section-title">Información del Paciente</h3>
+          <div class="card-light">
             <div class="flex items-center justify-between">
-              <span class="text-sm text-gray-600">Paciente:</span>
-              <span class="text-sm font-medium text-gray-900">{{ apt.patientName }}</span>
+              <span class="label-small">Paciente:</span>
+              <span class="font-medium text-gray-900">{{ apt.patientName }}</span>
             </div>
-            <button
-              type="button"
-              (click)="goToPatient(apt.patientId)"
-              class="text-sm text-primary-600 hover:text-primary-700 font-medium"
-            >
+            <button type="button" (click)="goToPatient(apt.patientId)" class="link">
               Ver ficha completa →
             </button>
           </div>
         </div>
 
-        <!-- Detalles del turno -->
+        <!-- Appointment Details -->
         <div>
-          <h3 class="text-lg font-semibold text-gray-900 mb-3">Detalles del Turno</h3>
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <p class="text-sm text-gray-600">Fecha</p>
-              <p class="text-sm font-medium text-gray-900 mt-1">
-                {{ apt.date | dateFormat:'EEEE, dd MMMM yyyy' }}
-              </p>
-            </div>
-            <div>
-              <p class="text-sm text-gray-600">Hora</p>
-              <p class="text-sm font-medium text-gray-900 mt-1">
-                {{ apt.startTime }} - {{ apt.endTime }}
-              </p>
-            </div>
-            <div>
-              <p class="text-sm text-gray-600">Duración</p>
-              <p class="text-sm font-medium text-gray-900 mt-1">
-                {{ apt.duration }} minutos
-              </p>
-            </div>
-            <div>
-              <p class="text-sm text-gray-600">Tipo</p>
-              <div class="mt-1" [innerHTML]="renderType(apt.type)"></div>
-            </div>
-            <div>
-              <p class="text-sm text-gray-600">Estado</p>
-              <div class="mt-1" [innerHTML]="renderStatus(apt.status)"></div>
-            </div>
-            <div class="col-span-2">
-              <p class="text-sm text-gray-600">Motivo de consulta</p>
-              <p class="text-sm font-medium text-gray-900 mt-1">
-                {{ apt.reason || 'No especificado' }}
-              </p>
-            </div>
-            @if (apt.notes) {
-              <div class="col-span-2">
-                <p class="text-sm text-gray-600">Notas</p>
-                <p class="text-sm text-gray-700 mt-1">
-                  {{ apt.notes }}
-                </p>
-              </div>
-            }
-            @if (apt.observations) {
-              <div class="col-span-2">
-                <p class="text-sm text-gray-600">Observaciones</p>
-                <p class="text-sm text-gray-700 mt-1">
-                  {{ apt.observations }}
-                </p>
-              </div>
-            }
+          <h3 class="section-title">Detalles del Turno</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div><p class="label-small">Fecha</p><p class="font-medium text-gray-900 mt-1">{{ apt.date | dateFormat:'EEEE, dd MMMM yyyy' }}</p></div>
+            <div><p class="label-small">Hora</p><p class="font-medium text-gray-900 mt-1">{{ apt.startTime }} - {{ apt.endTime }}</p></div>
+            <div><p class="label-small">Duración</p><p class="font-medium text-gray-900 mt-1">{{ apt.duration }} minutos</p></div>
+            <div><p class="label-small">Tipo</p><div class="mt-1" [innerHTML]="renderType(apt.type)"></div></div>
+            <div class="col-span-1 sm:col-span-2"><p class="label-small">Estado</p><div class="mt-1" [innerHTML]="renderStatus(apt.status)"></div></div>
+            <div class="col-span-1 sm:col-span-2"><p class="label-small">Motivo</p><p class="font-medium text-gray-900 mt-1">{{ apt.reason || 'N/A' }}</p></div>
           </div>
         </div>
 
-        <!-- Información de cancelación -->
+        <!-- Clinical Observations -->
+        <div class="card-light-blue">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="section-title flex items-center">
+              <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+              Observaciones Clínicas
+            </h3>
+            @if (!isEditingObservations() && apt.status !== 'cancelled') {
+              <button type="button" (click)="enableEditObservations()" class="btn btn-primary btn-sm">
+                {{ apt.observations ? 'Editar' : 'Agregar' }}
+              </button>
+            }
+          </div>
+
+          @if (isEditingObservations()) {
+            <div class="space-y-3">
+              <textarea [(ngModel)]="tempObservations" rows="5" placeholder="Ingrese las observaciones clínicas del turno..." class="textarea"></textarea>
+              <div class="flex gap-2 justify-end">
+                <button type="button" (click)="cancelEditObservations()" class="btn btn-secondary-outline">Cancelar</button>
+                <button type="button" (click)="saveObservations()" class="btn btn-primary">Guardar</button>
+              </div>
+            </div>
+          } @else {
+            <div class="text-sm text-gray-700">
+              @if (apt.observations) {
+                <p class="whitespace-pre-wrap">{{ apt.observations }}</p>
+              } @else {
+                <p class="text-gray-500 italic">No se han registrado observaciones.</p>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Cancellation Info -->
         @if (apt.status === 'cancelled' && apt.cancellationReason) {
-          <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div class="card-light-red">
             <div class="flex">
-              <svg class="w-5 h-5 text-red-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
+              <svg class="w-5 h-5 text-red-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
               <div class="ml-3">
                 <h4 class="text-sm font-medium text-red-900">Turno cancelado</h4>
-                <p class="text-sm text-red-700 mt-1">
-                  Motivo: {{ apt.cancellationReason }}
-                </p>
+                <p class="text-sm text-red-700 mt-1">Motivo: {{ apt.cancellationReason }}</p>
                 @if (apt.cancelledAt) {
-                  <p class="text-xs text-red-600 mt-1">
-                    Cancelado {{ apt.cancelledAt | timeAgo }}
-                  </p>
+                  <p class="text-xs text-red-600 mt-1">Cancelado {{ apt.cancelledAt | timeAgo }}</p>
                 }
               </div>
             </div>
           </div>
         }
-
-        <!-- Historial -->
-        <div>
-          <h3 class="text-lg font-semibold text-gray-900 mb-3">Historial</h3>
-          <div class="space-y-2">
-            <div class="flex items-center text-sm">
-              <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-              </svg>
-              <span class="text-gray-600">Creado:</span>
-              <span class="ml-2 text-gray-900">{{ apt.createdAt | timeAgo }}</span>
-            </div>
-            <div class="flex items-center text-sm">
-              <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              <span class="text-gray-600">Última actualización:</span>
-              <span class="ml-2 text-gray-900">{{ apt.updatedAt | timeAgo }}</span>
-            </div>
-          </div>
-        </div>
       </div>
 
-      <!-- Acciones -->
-      <div footer class="flex gap-3">
-        @if (apt.status === 'scheduled') {
-          <button
-            type="button"
-            (click)="confirmAppointment(apt)"
-            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-          >
-            Confirmar Turno
-          </button>
-        }
-
-        @if (apt.status === 'confirmed' || apt.status === 'scheduled') {
-          <button
-            type="button"
-            (click)="startAppointment(apt)"
-            class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-          >
-            Iniciar Consulta
-          </button>
-        }
-
-        @if (apt.status === 'in_progress') {
-          <button
-            type="button"
-            (click)="completeAppointment(apt)"
-            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Completar y Registrar
-          </button>
-        }
-
-        @if (apt.status !== 'cancelled' && apt.status !== 'completed') {
-          <button
-            type="button"
-            (click)="cancelAppointment(apt)"
-            class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-          >
-            Cancelar Turno
-          </button>
-        }
-
-        @if (apt.status === 'confirmed' || apt.status === 'scheduled') {
-          <button
-            type="button"
-            (click)="markAsNoShow(apt)"
-            class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
-          >
-            Marcar No Asistió
-          </button>
-        }
-
-        <button
-          type="button"
-          (click)="closeDetailModal()"
-          class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors ml-auto"
-        >
-          Cerrar
-        </button>
+      <!-- Actions -->
+      <div footer class="flex flex-wrap gap-3">
+        @if (apt.status === 'scheduled') { <button type="button" (click)="confirmAppointment(apt)" class="btn btn-success">Confirmar</button> }
+        @if (apt.status === 'confirmed' || apt.status === 'scheduled') { <button type="button" (click)="startAppointment(apt)" class="btn btn-primary">Iniciar Consulta</button> }
+        @if (apt.status === 'in_progress') { <button type="button" (click)="completeAppointment(apt)" class="btn btn-primary">Completar</button> }
+        @if (apt.status !== 'cancelled' && apt.status !== 'completed') { <button type="button" (click)="cancelAppointment(apt)" class="btn btn-danger">Cancelar</button> }
+        @if (apt.status === 'confirmed' || apt.status === 'scheduled') { <button type="button" (click)="markAsNoShow(apt)" class="btn btn-warning">No Asistió</button> }
+        <button type="button" (click)="closeDetailModal()" class="btn btn-secondary-outline ml-auto">Cerrar</button>
       </div>
     }
   </app-modal>

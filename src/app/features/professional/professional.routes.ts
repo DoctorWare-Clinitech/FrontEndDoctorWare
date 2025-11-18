@@ -16,11 +16,32 @@ export const PROFESSIONAL_ROUTES: Routes = [
       },
       {
         path: 'appointments',
-        loadComponent: () => import('./appointments/appointments').then(m => m.Appointments)
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./appointments/appointments').then(m => m.Appointments)
+          },
+          {
+            path: 'new',
+            loadComponent: () => import('./appointments/appointment-form/appointment-form').then(m => m.AppointmentForm)
+          }
+        ]
       },
       {
         path: 'patients',
         loadComponent: () => import('./patients/patients').then(m => m.Patients)
+      },
+      {
+        path: 'patients/new',
+        loadComponent: () => import('./patients/patient-form/patient-form').then(m => m.PatientForm)
+      },
+      {
+        path: 'patients/edit/:id',
+        loadComponent: () => import('./patients/patient-form/patient-form').then(m => m.PatientForm)
+      },
+      {
+        path: 'patients/:id',
+        loadComponent: () => import('./patients/patient-detail/patient-detail').then(m => m.PatientDetail)
       },
       {
         path: 'schedule',

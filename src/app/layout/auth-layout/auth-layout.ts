@@ -8,7 +8,7 @@ import { RouterOutlet } from '@angular/router';
   imports: [RouterOutlet],
   template: `
     <div class="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center p-4">
-      <div class="w-full max-w-md">
+      <div class="w-full max-w-6xl">
         <!-- Logo y título -->
         <div class="text-center mb-8">
           <div class="inline-flex items-center justify-center w-16 h-16 bg-primary-500 rounded-full mb-4">

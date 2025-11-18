@@ -1,0 +1,129 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4 py-12">
+  <div class="max-w-md w-full">
+    <!-- Processing State -->
+    <div *ngIf="status === 'processing'" class="bg-white rounded-lg shadow-xl p-8 text-center">
+      <div class="flex justify-center mb-6">
+        <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-800 mb-2">Verificando tu email</h2>
+      <p class="text-gray-600">{{ message }}</p>
+      <p class="text-sm text-gray-500 mt-4">Por favor espera un momento...</p>
+    </div>
+
+    <!-- Success State -->
+    <div *ngIf="status === 'success'" class="bg-white rounded-lg shadow-xl p-8 text-center">
+      <div class="flex justify-center mb-6">
+        <div class="rounded-full bg-green-100 p-4">
+          <svg class="h-16 w-16 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-800 mb-2">Email verificado exitosamente</h2>
+      <p class="text-gray-600 mb-6">{{ message }}</p>
+      <p class="text-sm text-gray-500 mb-6">
+        Tu cuenta ha sido activada. Ya puedes iniciar sesión con tus credenciales.
+      </p>
+      <button
+        (click)="goToLogin()"
+        class="w-full bg-blue-600 text-white rounded-lg py-3 px-4 hover:bg-blue-700 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      >
+        Ir al inicio de sesión
+      </button>
+    </div>
+
+    <!-- Expired State -->
+    <div *ngIf="status === 'expired'" class="bg-white rounded-lg shadow-xl p-8 text-center">
+      <div class="flex justify-center mb-6">
+        <div class="rounded-full bg-yellow-100 p-4">
+          <svg class="h-16 w-16 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-800 mb-2">Enlace expirado</h2>
+      <p class="text-gray-600 mb-2">{{ message }}</p>
+      <p class="text-sm text-gray-500 mb-6">{{ errorDetails }}</p>
+      <div class="space-y-3">
+        <button
+          (click)="goToResendConfirmation()"
+          class="w-full bg-blue-600 text-white rounded-lg py-3 px-4 hover:bg-blue-700 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          Solicitar nuevo enlace
+        </button>
+        <button
+          (click)="goToLogin()"
+          class="w-full bg-gray-200 text-gray-700 rounded-lg py-3 px-4 hover:bg-gray-300 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+        >
+          Volver al inicio de sesión
+        </button>
+      </div>
+    </div>
+
+    <!-- Invalid State -->
+    <div *ngIf="status === 'invalid'" class="bg-white rounded-lg shadow-xl p-8 text-center">
+      <div class="flex justify-center mb-6">
+        <div class="rounded-full bg-red-100 p-4">
+          <svg class="h-16 w-16 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </div>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-800 mb-2">Enlace inválido</h2>
+      <p class="text-gray-600 mb-2">{{ message }}</p>
+      <p class="text-sm text-gray-500 mb-6">{{ errorDetails }}</p>
+      <div class="space-y-3">
+        <button
+          (click)="goToResendConfirmation()"
+          class="w-full bg-blue-600 text-white rounded-lg py-3 px-4 hover:bg-blue-700 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          Solicitar nuevo enlace
+        </button>
+        <button
+          (click)="goToLogin()"
+          class="w-full bg-gray-200 text-gray-700 rounded-lg py-3 px-4 hover:bg-gray-300 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+        >
+          Volver al inicio de sesión
+        </button>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="status === 'error'" class="bg-white rounded-lg shadow-xl p-8 text-center">
+      <div class="flex justify-center mb-6">
+        <div class="rounded-full bg-red-100 p-4">
+          <svg class="h-16 w-16 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+          </svg>
+        </div>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-800 mb-2">Error al verificar</h2>
+      <p class="text-gray-600 mb-2">{{ message }}</p>
+      <p class="text-sm text-gray-500 mb-6">{{ errorDetails }}</p>
+      <div class="space-y-3">
+        <button
+          (click)="goToResendConfirmation()"
+          class="w-full bg-blue-600 text-white rounded-lg py-3 px-4 hover:bg-blue-700 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        >
+          Solicitar nuevo enlace
+        </button>
+        <button
+          (click)="goToLogin()"
+          class="w-full bg-gray-200 text-gray-700 rounded-lg py-3 px-4 hover:bg-gray-300 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+        >
+          Volver al inicio de sesión
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-8 text-center">
+      <p class="text-sm text-gray-600">
+        ¿Necesitas ayuda?
+        <a routerLink="/auth/login" class="text-blue-600 hover:text-blue-700 font-medium ml-1">
+          Contacta con soporte
+        </a>
+      </p>
+    </div>
+  </div>
+</div>

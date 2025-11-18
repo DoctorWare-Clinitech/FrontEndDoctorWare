@@ -83,10 +83,49 @@ export class PatientsService {
   }
 
   /**
+   * Obtener historial médico del paciente (alias de getHistory)
+   */
+  getMedicalHistory(patientId: string): Observable<any[]> {
+    return this.getHistory(patientId);
+  }
+
+  /**
    * Obtener resumen de pacientes
    */
-  getSummary(): Observable<PatientSummary[]> {
-    return this.http.get<PatientSummary[]>(`${this.API_URL}/summary`);
+  getPatientsSummary(professionalId?: string): Observable<PatientSummary[]> {
+    const params: any = {};
+    if (professionalId) {
+      params.professionalId = professionalId;
+    }
+    return this.http.get<PatientSummary[]>(`${this.API_URL}/summary`, { params });
+  }
+
+  /**
+   * Obtener resumen de pacientes (alias para compatibilidad)
+   * @deprecated Use getPatientsSummary() instead
+   */
+  getSummary(professionalId?: string): Observable<PatientSummary[]> {
+    return this.getPatientsSummary(professionalId);
+  }
+
+  /**
+   * Buscar pacientes por nombre o DNI (para selects/autocomplete)
+   */
+  searchPatients(query: string, professionalId?: string): Observable<Patient[]> {
+    const filters: PatientFilters = {
+      professionalId,
+      isActive: true
+    };
+
+    // Si el query parece ser un DNI (solo números), buscar por DNI
+    if (/^\d+$/.test(query)) {
+      filters.dni = query;
+    } else {
+      // Si no, buscar por nombre
+      filters.name = query;
+    }
+
+    return this.getAll(filters);
   }
 
   /**

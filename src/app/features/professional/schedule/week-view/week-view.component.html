@@ -1,0 +1,49 @@
+<div class="card">
+  <div class="p-4 border-b">
+    @if(weekInterval) {
+      <h2 class="text-lg font-semibold">
+        Semana del {{ weekInterval.start | dateFormat:'dd/MM' }} al {{ weekInterval.end | dateFormat:'dd/MM/yyyy' }}
+      </h2>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="flex justify-center items-center h-96">
+      <div class="spinner"></div>
+    </div>
+  } @else {
+    <div class="grid grid-cols-7 border-t border-gray-200 min-h-96">
+      @for (day of weekDays(); track day.date) {
+        <div class="border-l border-gray-200">
+          <!-- Day Header -->
+          <div class="text-center py-2 border-b border-gray-200">
+            <p class="font-semibold text-sm">{{ day.date | dateFormat:'EEE' }}</p>
+            <p class="text-gray-600 text-lg">{{ day.date | dateFormat:'dd' }}</p>
+          </div>
+          <!-- Slots -->
+          <div class="p-2 space-y-2 max-h-[60vh] overflow-y-auto">
+            @for (slot of day.slots; track slot.time) {
+              <button 
+                (click)="bookAppointment(slot, day.date)"
+                [disabled]="!slot.available"
+                class="w-full p-2 rounded-lg text-center text-xs border"
+                [ngClass]="{
+                  'bg-green-50 border-green-200 text-green-800 hover:bg-green-100': slot.available,
+                  'bg-gray-100 border-gray-200 text-gray-500 cursor-not-allowed': !slot.available
+                }"
+              >
+                <span class="font-mono font-semibold">{{ slot.time }}</span>
+                <span class="block">{{ slot.available ? 'Disponible' : 'Ocupado' }}</span>
+              </button>
+            }
+            @if (day.slots.length === 0) {
+              <div class="text-center py-8 text-gray-400 text-sm">
+                Sin horarios
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

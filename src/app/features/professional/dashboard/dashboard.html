@@ -116,15 +116,22 @@
   <div class="card">
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-xl font-bold text-gray-900">Turnos de Hoy</h2>
-      <button 
+      <button
         type="button"
         (click)="loadDashboardData()"
-        class="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1"
+        [disabled]="isLoading()"
+        class="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg
+          class="w-4 h-4"
+          [class.animate-spin]="isLoading()"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
-        Actualizar
+        {{ isLoading() ? 'Actualizando...' : 'Actualizar' }}
       </button>
     </div>
 

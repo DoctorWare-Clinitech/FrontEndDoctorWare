@@ -23,12 +23,24 @@ export const jwtInterceptor: HttpInterceptorFn = (
     return next(req);
   }
 
-  // Lista de URLs que no requieren token
+  // Lista de URLs que no requieren token (incluye variaciones de mayúsculas/minúsculas)
   const excludedUrls = [
     '/auth/login',
+    '/Auth/login',
     '/auth/register',
+    '/Auth/register',
+    '/auth/register/patient',
+    '/Auth/register/patient',
+    '/auth/register/professional',
+    '/Auth/register/professional',
+    '/auth/specialties',
+    '/Auth/specialties',
     '/auth/forgot-password',
-    '/auth/reset-password'
+    '/Auth/forgot-password',
+    '/auth/reset-password',
+    '/Auth/reset-password',
+    '/auth/refresh',
+    '/Auth/refresh'
   ];
 
   // Verificar si la URL actual debe excluirse

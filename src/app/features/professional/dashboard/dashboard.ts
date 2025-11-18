@@ -6,11 +6,7 @@ import { ToastService } from '../../../shared/services/toast.service';
 import { AppointmentsService } from '../../../core/services/appointments.service';
 import { PatientsService } from '../../../core/services/patients.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { 
-  DateFormatPipe, 
-  TimeAgoPipe, 
-  InitialsPipe 
-} from '../../../shared/pipes';
+import { DateFormatPipe } from '../../../shared/pipes';
 import { Appointment } from '../../../core/models';
 import { toSignal } from '@angular/core/rxjs-interop';
 
@@ -26,9 +22,7 @@ interface DashboardStats {
   imports: [
     Table,
     Modal,
-    DateFormatPipe,
-    TimeAgoPipe,
-    InitialsPipe
+    DateFormatPipe
   ],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss'],
@@ -118,46 +112,45 @@ export class Dashboard implements OnInit {
   /**
    * Cargar datos del dashboard
    */
-  public loadDashboardData(): void {
+  public async loadDashboardData(): Promise<void> {
     this.isLoading.set(true);
 
-    // Cargar turnos de hoy
-    this.appointmentsService.getToday().subscribe({
-      next: (appointments) => {
-        this.todayAppointments.set(appointments);
-        this.calculateStats(appointments);
-        this.isLoading.set(false);
-      },
-      error: (error) => {
-        console.error('Error loading appointments:', error);
-        this.toastService.error('Error', 'No se pudieron cargar los turnos');
-        this.isLoading.set(false);
-      }
-    });
+    const professionalUserId = this.currentUser()?.id;
 
-    // Cargar pacientes para el contador
-    this.patientsService.getAll().subscribe({
-      next: (patients) => {
-        this.stats.update(s => ({ ...s, totalPatients: patients.length }));
-      },
-      error: (error) => {
-        console.error('Error loading patients:', error);
-      }
-    });
-  }
+    if (!professionalUserId) {
+      this.toastService.error('Error', 'No se pudo obtener el ID del profesional');
+      this.isLoading.set(false);
+      return;
+    }
 
-  /**
-   * Calcular estadísticas
-   */
-  private calculateStats(appointments: Appointment[]): void {
-    const stats: DashboardStats = {
-      todayAppointments: appointments.length,
-      totalPatients: this.stats().totalPatients,
-      pendingAppointments: appointments.filter(a => a.status === 'scheduled' || a.status === 'confirmed').length,
-      completedToday: appointments.filter(a => a.status === 'completed').length
-    };
+    try {
+      // Cargar todos los datos en paralelo usando el professionalUserId
+      const [appointments, stats, patients] = await Promise.all([
+        this.appointmentsService.getTodayByProfessional(professionalUserId).toPromise(),
+        this.appointmentsService.getStats(professionalUserId).toPromise(),
+        this.patientsService.getAll({ professionalId: professionalUserId }).toPromise()
+      ]);
 
-    this.stats.set(stats);
+      // Actualizar state
+      this.todayAppointments.set(appointments || []);
+
+      // Calcular estadísticas combinando datos
+      const dashboardStats: DashboardStats = {
+        todayAppointments: appointments?.length || 0,
+        totalPatients: patients?.length || 0,
+        pendingAppointments: appointments?.filter(a =>
+          a.status === 'scheduled' || a.status === 'confirmed'
+        ).length || 0,
+        completedToday: appointments?.filter(a => a.status === 'completed').length || 0
+      };
+
+      this.stats.set(dashboardStats);
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+      this.toastService.error('Error', 'No se pudieron cargar los datos del dashboard');
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
   /**

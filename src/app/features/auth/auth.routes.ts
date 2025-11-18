@@ -16,11 +16,27 @@ export const AUTH_ROUTES: Routes = [
       },
       {
         path: 'register',
-        loadComponent: () => import('./register/register').then(m => m.Register)
+        loadComponent: () => import('./register-selection/register-selection').then(m => m.RegisterSelection)
+      },
+      {
+        path: 'register/patient',
+        loadComponent: () => import('./register-patient/register-patient').then(m => m.RegisterPatient)
+      },
+      {
+        path: 'register/professional',
+        loadComponent: () => import('./register-professional/register-professional').then(m => m.RegisterProfessional)
       },
       {
         path: 'forgot-password',
         loadComponent: () => import('./forgot-password/forgot-password').then(m => m.ForgotPassword)
+      },
+      {
+        path: 'reset-password',
+        loadComponent: () => import('./reset-password/reset-password').then(m => m.ResetPassword)
+      },
+      {
+        path: 'verify-email',
+        loadComponent: () => import('./verify-email/verify-email').then(m => m.VerifyEmail)
       }
     ]
   }

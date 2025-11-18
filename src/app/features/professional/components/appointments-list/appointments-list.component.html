@@ -1,0 +1,156 @@
+<div class="appointments-list-container">
+  <!-- Header -->
+  <div class="header">
+    <h1 class="title">Gestión de Turnos</h1>
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="createNewAppointment()"
+    >
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+      </svg>
+      Nuevo Turno
+    </button>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters-section">
+    <div class="filters-header">
+      <h2 class="filters-title">Filtros</h2>
+      <button
+        type="button"
+        class="btn btn-text"
+        (click)="clearFilters()"
+      >
+        Limpiar filtros
+      </button>
+    </div>
+
+    <div class="filters-grid">
+      <!-- Búsqueda -->
+      <div class="filter-item full-width">
+        <label for="search" class="filter-label">Buscar</label>
+        <div class="search-input-wrapper">
+          <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <input
+            id="search"
+            type="text"
+            class="form-input search-input"
+            placeholder="Buscar por paciente, profesional o motivo..."
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearchChange()"
+          />
+        </div>
+      </div>
+
+      <!-- Filtro de Estado -->
+      <div class="filter-item">
+        <label for="status" class="filter-label">Estado</label>
+        <select
+          id="status"
+          class="form-select"
+          [(ngModel)]="selectedStatus"
+          (ngModelChange)="onStatusChange()"
+        >
+          <option *ngFor="let option of statusOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Filtro de Tipo -->
+      <div class="filter-item">
+        <label for="type" class="filter-label">Tipo</label>
+        <select
+          id="type"
+          class="form-select"
+          [(ngModel)]="selectedType"
+          (ngModelChange)="onTypeChange()"
+        >
+          <option *ngFor="let option of typeOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Fecha Desde -->
+      <div class="filter-item">
+        <label for="startDate" class="filter-label">Desde</label>
+        <input
+          id="startDate"
+          type="date"
+          class="form-input"
+          [(ngModel)]="startDate"
+          (ngModelChange)="onDateChange()"
+        />
+      </div>
+
+      <!-- Fecha Hasta -->
+      <div class="filter-item">
+        <label for="endDate" class="filter-label">Hasta</label>
+        <input
+          id="endDate"
+          type="date"
+          class="form-input"
+          [(ngModel)]="endDate"
+          (ngModelChange)="onDateChange()"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensajes de estado -->
+  <div *ngIf="error" class="alert alert-error">
+    <svg class="alert-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <span>{{ error }}</span>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p class="loading-text">Cargando turnos...</p>
+  </div>
+
+  <!-- Lista de turnos -->
+  <div *ngIf="!loading && !error" class="appointments-grid">
+    <div *ngIf="filteredAppointments.length === 0" class="empty-state">
+      <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+      </svg>
+      <h3 class="empty-title">No se encontraron turnos</h3>
+      <p class="empty-description">
+        No hay turnos que coincidan con los filtros seleccionados.
+      </p>
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="clearFilters()"
+      >
+        Limpiar filtros
+      </button>
+    </div>
+
+    <app-appointment-card
+      *ngFor="let appointment of filteredAppointments"
+      [appointment]="appointment"
+      [showPatient]="true"
+      [showProfessional]="true"
+      (onView)="onViewAppointment($event)"
+      (onEdit)="onEditAppointment($event)"
+      (onConfirm)="onConfirmAppointment($event)"
+      (onComplete)="onCompleteAppointment($event)"
+      (onCancel)="onCancelAppointment($event)"
+    ></app-appointment-card>
+  </div>
+
+  <!-- Contador de resultados -->
+  <div *ngIf="!loading && !error && filteredAppointments.length > 0" class="results-count">
+    Mostrando {{ filteredAppointments.length }}
+    {{ filteredAppointments.length === 1 ? 'turno' : 'turnos' }}
+  </div>
+</div>

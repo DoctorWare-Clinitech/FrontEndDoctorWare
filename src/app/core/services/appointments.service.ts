@@ -18,18 +18,28 @@ export class AppointmentsService {
   private readonly http = inject(HttpClient);
   private readonly API_URL = `${environment.apiBaseUrl}/appointments`;
 
-  private appointments = signal<Appointment[]>([]);
-  readonly appointments$ = this.appointments.asReadonly();
+  private appointmentsSignal = signal<Appointment[]>([]);
+  readonly appointments = this.appointmentsSignal.asReadonly();
 
   /**
-   * Obtener todos los turnos
+   * Carga los turnos en el estado del servicio y devuelve un observable.
+   * Usar este método para la carga principal de datos.
    */
-  getAll(filters?: AppointmentFilters): Observable<Appointment[]> {
+  loadAll(filters?: AppointmentFilters): Observable<Appointment[]> {
     const params = this.buildQueryParams(filters);
     
     return this.http.get<Appointment[]>(this.API_URL, { params }).pipe(
-      tap(appointments => this.appointments.set(appointments))
+      tap(appointments => this.appointmentsSignal.set(appointments))
     );
+  }
+
+  /**
+   * Obtiene una lista de turnos basada en filtros, pero NO modifica el estado del servicio.
+   * Usar este método para obtener datos para vistas específicas sin efectos secundarios.
+   */
+  getAll(filters?: AppointmentFilters): Observable<Appointment[]> {
+    const params = this.buildQueryParams(filters);
+    return this.http.get<Appointment[]>(this.API_URL, { params });
   }
 
   /**
@@ -45,7 +55,7 @@ export class AppointmentsService {
   create(data: CreateAppointmentDto): Observable<Appointment> {
     return this.http.post<Appointment>(this.API_URL, data).pipe(
       tap(appointment => {
-        this.appointments.update(current => [...current, appointment]);
+        this.appointmentsSignal.update(current => [...current, appointment]);
       })
     );
   }
@@ -56,7 +66,7 @@ export class AppointmentsService {
   update(id: string, data: UpdateAppointmentDto): Observable<Appointment> {
     return this.http.put<Appointment>(`${this.API_URL}/${id}`, data).pipe(
       tap(updated => {
-        this.appointments.update(current =>
+        this.appointmentsSignal.update(current =>
           current.map(a => a.id === id ? updated : a)
         );
       })
@@ -69,7 +79,7 @@ export class AppointmentsService {
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.API_URL}/${id}`).pipe(
       tap(() => {
-        this.appointments.update(current =>
+        this.appointmentsSignal.update(current =>
           current.filter(a => a.id !== id)
         );
       })
@@ -110,10 +120,31 @@ export class AppointmentsService {
   }
 
   /**
+   * Obtener turnos de hoy filtrados por profesional
+   */
+  getTodayByProfessional(professionalUserId: string): Observable<Appointment[]> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    return this.getAll({
+      professionalId: professionalUserId,
+      startDate: today,
+      endDate: tomorrow
+    });
+  }
+
+  /**
    * Obtener estadísticas de turnos
    */
-  getStats(): Observable<AppointmentStats> {
-    return this.http.get<AppointmentStats>(`${this.API_URL}/stats`);
+  getStats(professionalUserId?: string): Observable<AppointmentStats> {
+    const params: any = {};
+    if (professionalUserId) {
+      params.professionalUserId = professionalUserId;
+    }
+    return this.http.get<AppointmentStats>(`${this.API_URL}/stats`, { params });
   }
 
   /**

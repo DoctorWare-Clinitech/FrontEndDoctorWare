@@ -41,3 +41,45 @@
 .animate-spin {
   animation: spin 1s linear infinite;
 }
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .card {
+    &:hover {
+      transform: none; // Disable hover on mobile
+    }
+  }
+
+  // Reduce animation delay on mobile
+  .grid > .card {
+    animation-delay: 0.1s !important;
+  }
+}
+
+// Loading overlay
+.loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+
+  .spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 4px solid #e5e7eb;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
+
+// Button states
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+
+  &:hover {
+    transform: none;
+  }
+}
