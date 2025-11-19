@@ -20,6 +20,11 @@ export const PATIENT_ROUTES: Routes = [
           import('./my-appointments/my-appointments').then((m) => m.MyAppointments),
       },
       {
+        path: 'book-appointment',
+        loadComponent: () =>
+          import('./book-appointment/book-appointment').then((m) => m.BookAppointment),
+      },
+      {
         path: 'profile',
         loadComponent: () => import('./profile/profile').then((m) => m.Profile),
       },

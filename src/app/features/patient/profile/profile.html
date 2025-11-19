@@ -1,1 +1,191 @@
-<p>profile works!</p>
+<div class="max-w-4xl mx-auto space-y-6">
+
+  <!-- Header -->
+  <div>
+    <h1 class="text-3xl font-bold text-gray-900">Mi Perfil</h1>
+    <p class="text-gray-600 mt-1">Información personal y configuración de cuenta</p>
+  </div>
+
+  @if (currentUser(); as user) {
+    <!-- Información Personal -->
+    <div class="card">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold text-gray-900">Información Personal</h2>
+        <button
+          type="button"
+          (click)="showNotAvailableMessage()"
+          class="text-primary-600 hover:text-primary-700 font-medium text-sm flex items-center gap-1"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+          </svg>
+          Editar
+        </button>
+      </div>
+
+      <div class="space-y-6">
+        <!-- Avatar y nombre -->
+        <div class="flex items-center gap-6">
+          <div class="w-24 h-24 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center text-3xl font-bold">
+            {{ user.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() }}
+          </div>
+          <div>
+            <h3 class="text-2xl font-semibold text-gray-900">{{ user.name }}</h3>
+            <p class="text-gray-600 mt-1">Paciente</p>
+          </div>
+        </div>
+
+        <!-- Datos personales -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="text-sm font-medium text-gray-600 block mb-1">Correo electrónico</label>
+            <p class="text-gray-900">{{ user.email }}</p>
+          </div>
+
+          @if (user.phone) {
+            <div>
+              <label class="text-sm font-medium text-gray-600 block mb-1">Teléfono</label>
+              <p class="text-gray-900">{{ user.phone }}</p>
+            </div>
+          }
+
+          @if (user.dni) {
+            <div>
+              <label class="text-sm font-medium text-gray-600 block mb-1">DNI</label>
+              <p class="text-gray-900">{{ user.dni }}</p>
+            </div>
+          }
+
+          <div>
+            <label class="text-sm font-medium text-gray-600 block mb-1">Estado de la cuenta</label>
+            <span
+              class="inline-flex px-3 py-1 rounded-full text-sm font-medium"
+              [class.bg-green-100]="user.status === 'active'"
+              [class.text-green-800]="user.status === 'active'"
+              [class.bg-red-100]="user.status === 'inactive'"
+              [class.text-red-800]="user.status === 'inactive'"
+            >
+              {{ user.status === 'active' ? 'Activa' : 'Inactiva' }}
+            </span>
+          </div>
+        </div>
+
+        @if (user.dateOfBirth) {
+          <div>
+            <label class="text-sm font-medium text-gray-600 block mb-1">Fecha de nacimiento</label>
+            <p class="text-gray-900">{{ user.dateOfBirth | date:'dd/MM/yyyy' }}</p>
+          </div>
+        }
+
+        @if (user.address) {
+          <div>
+            <label class="text-sm font-medium text-gray-600 block mb-1">Dirección</label>
+            <p class="text-gray-900">{{ user.address }}</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Información de cuenta -->
+    <div class="card">
+      <h2 class="text-xl font-bold text-gray-900 mb-6">Información de Cuenta</h2>
+
+      <div class="space-y-4">
+        <div class="flex items-center justify-between py-3 border-b">
+          <div>
+            <p class="font-medium text-gray-900">Cambiar contraseña</p>
+            <p class="text-sm text-gray-600">Actualiza tu contraseña regularmente para mayor seguridad</p>
+          </div>
+          <button
+            type="button"
+            (click)="showNotAvailableMessage()"
+            class="text-primary-600 hover:text-primary-700 font-medium text-sm"
+          >
+            Cambiar
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between py-3 border-b">
+          <div>
+            <p class="font-medium text-gray-900">Notificaciones por email</p>
+            <p class="text-sm text-gray-600">Recibe recordatorios de turnos y novedades</p>
+          </div>
+          <button
+            type="button"
+            (click)="showNotAvailableMessage()"
+            class="relative inline-flex h-6 w-11 items-center rounded-full bg-primary-600"
+          >
+            <span class="translate-x-6 inline-block h-4 w-4 transform rounded-full bg-white transition"></span>
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between py-3">
+          <div>
+            <p class="font-medium text-gray-900">Recordatorios de turnos</p>
+            <p class="text-sm text-gray-600">Recibe notificaciones 24hs antes de tu turno</p>
+          </div>
+          <button
+            type="button"
+            (click)="showNotAvailableMessage()"
+            class="relative inline-flex h-6 w-11 items-center rounded-full bg-primary-600"
+          >
+            <span class="translate-x-6 inline-block h-4 w-4 transform rounded-full bg-white transition"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seguro médico (si está disponible) -->
+    @if (user.medicalInsurance) {
+      <div class="card">
+        <h2 class="text-xl font-bold text-gray-900 mb-6">Seguro Médico</h2>
+
+        <div class="space-y-4">
+          <div>
+            <label class="text-sm font-medium text-gray-600 block mb-1">Obra Social / Prepaga</label>
+            <p class="text-gray-900">{{ user.medicalInsurance.provider }}</p>
+          </div>
+
+          @if (user.medicalInsurance.number) {
+            <div>
+              <label class="text-sm font-medium text-gray-600 block mb-1">Número de afiliado</label>
+              <p class="text-gray-900">{{ user.medicalInsurance.number }}</p>
+            </div>
+          }
+
+          @if (user.medicalInsurance.plan) {
+            <div>
+              <label class="text-sm font-medium text-gray-600 block mb-1">Plan</label>
+              <p class="text-gray-900">{{ user.medicalInsurance.plan }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Fecha de registro -->
+    <div class="card bg-gray-50">
+      <div class="flex items-center gap-3 text-sm text-gray-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <span>Miembro desde {{ user.createdAt | date:'MMMM yyyy' }}</span>
+      </div>
+    </div>
+
+    <!-- Nota informativa -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div class="flex gap-3">
+        <svg class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div class="text-sm text-blue-800">
+          <p class="font-medium mb-1">Actualización de datos</p>
+          <p>
+            Para modificar tu información personal, por favor contacta al administrador del sistema o envía un email a soporte&#64;doctorware.com
+          </p>
+        </div>
+      </div>
+    </div>
+  }
+</div>

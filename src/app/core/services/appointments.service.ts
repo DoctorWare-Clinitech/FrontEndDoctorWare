@@ -160,6 +160,14 @@ export class AppointmentsService {
   }
 
   /**
+   * Obtener turnos del paciente autenticado (endpoint específico para pacientes)
+   * GET /api/me/appointments
+   */
+  getMyAppointments(): Observable<Appointment[]> {
+    return this.http.get<Appointment[]>(`${environment.apiBaseUrl}/me/appointments`);
+  }
+
+  /**
    * Construir parámetros de query
    */
   private buildQueryParams(filters?: AppointmentFilters): any {
