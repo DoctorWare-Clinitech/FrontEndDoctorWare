@@ -6,7 +6,7 @@
     <p class="text-gray-600 mt-1">Información personal y configuración de cuenta</p>
   </div>
 
-  @if (currentUser(); as user) {
+  @if (patientUser(); as user) {
     <!-- Información Personal -->
     <div class="card">
       <div class="flex items-center justify-between mb-6">
@@ -27,7 +27,7 @@
         <!-- Avatar y nombre -->
         <div class="flex items-center gap-6">
           <div class="w-24 h-24 bg-primary-100 text-primary-700 rounded-full flex items-center justify-center text-3xl font-bold">
-            {{ user.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() }}
+            {{ getInitials(user.name) }}
           </div>
           <div>
             <h3 class="text-2xl font-semibold text-gray-900">{{ user.name }}</h3>
@@ -143,22 +143,8 @@
         <div class="space-y-4">
           <div>
             <label class="text-sm font-medium text-gray-600 block mb-1">Obra Social / Prepaga</label>
-            <p class="text-gray-900">{{ user.medicalInsurance.provider }}</p>
+            <p class="text-gray-900">{{ user.medicalInsurance }}</p>
           </div>
-
-          @if (user.medicalInsurance.number) {
-            <div>
-              <label class="text-sm font-medium text-gray-600 block mb-1">Número de afiliado</label>
-              <p class="text-gray-900">{{ user.medicalInsurance.number }}</p>
-            </div>
-          }
-
-          @if (user.medicalInsurance.plan) {
-            <div>
-              <label class="text-sm font-medium text-gray-600 block mb-1">Plan</label>
-              <p class="text-gray-900">{{ user.medicalInsurance.plan }}</p>
-            </div>
-          }
         </div>
       </div>
     }

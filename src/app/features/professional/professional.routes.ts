@@ -37,11 +37,13 @@ export const PROFESSIONAL_ROUTES: Routes = [
       },
       {
         path: 'patients/edit/:id',
-        loadComponent: () => import('./patients/patient-form/patient-form').then(m => m.PatientForm)
+        loadComponent: () => import('./patients/patient-form/patient-form').then(m => m.PatientForm),
+        data: { prerender: false }
       },
       {
         path: 'patients/:id',
-        loadComponent: () => import('./patients/patient-detail/patient-detail').then(m => m.PatientDetail)
+        loadComponent: () => import('./patients/patient-detail/patient-detail').then(m => m.PatientDetail),
+        data: { prerender: false }
       },
       {
         path: 'schedule',

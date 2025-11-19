@@ -22,7 +22,6 @@ interface PatientDashboardStats {
   imports: [
     CommonModule,
     Table,
-    DateFormatPipe
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',

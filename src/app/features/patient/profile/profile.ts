@@ -1,7 +1,8 @@
-import { Component, ChangeDetectionStrategy, inject, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '../../../shared/services/toast.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { PatientUser } from '../../../core/models';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -19,6 +20,12 @@ export class Profile implements OnInit {
   // State
   protected readonly isLoading = signal(false);
   protected readonly currentUser = toSignal(this.authService.currentUser$);
+
+  // Computed - Usuario como paciente con propiedades específicas
+  protected readonly patientUser = computed(() => {
+    const user = this.currentUser();
+    return user as PatientUser | null;
+  });
 
   ngOnInit(): void {
     this.loadProfile();
@@ -40,5 +47,17 @@ export class Profile implements OnInit {
       'Funcionalidad no disponible',
       'La edición del perfil estará disponible próximamente. Por favor contacta al administrador para modificar tus datos.'
     );
+  }
+
+  /**
+   * Obtener iniciales del nombre
+   */
+  protected getInitials(name: string): string {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase();
   }
 }

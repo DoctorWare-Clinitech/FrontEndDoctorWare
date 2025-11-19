@@ -239,6 +239,9 @@ export class BookAppointment implements OnInit {
     this.isSubmitting.set(true);
 
     try {
+      // Verificar si el usuario es un paciente y tiene DNI
+      const patientDni = (user as any).dni || '';
+
       const appointmentData = {
         professionalId: professional.id,
         date: date,
@@ -248,7 +251,7 @@ export class BookAppointment implements OnInit {
           lastName: user.name.split(' ').slice(1).join(' '),
           email: user.email,
           phoneNumber: user.phone || '',
-          dni: user.dni || ''
+          dni: patientDni
         },
         comments: this.appointmentForm.value.comments || ''
       };

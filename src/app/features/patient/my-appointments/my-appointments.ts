@@ -11,7 +11,7 @@ import { DateFormatPipe } from '../../../shared/pipes';
 import { Appointment, AppointmentStatus } from '../../../core/models';
 import { toSignal } from '@angular/core/rxjs-interop';
 
-type FilterStatus = 'all' | AppointmentStatus;
+type FilterStatus = 'all' | 'scheduled' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled' | 'no_show';
 
 @Component({
   selector: 'app-my-appointments',
