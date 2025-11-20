@@ -98,7 +98,7 @@ export class BookAppointment implements OnInit {
 
     try {
       const specialties = await this.http.get<Specialty[]>(
-        `${environment.apiBaseUrl}/professionals/specialties`
+        `${environment.apiBaseUrl}/Specialties`
       ).toPromise();
 
       this.specialties.set(specialties || []);
@@ -129,7 +129,7 @@ export class BookAppointment implements OnInit {
 
     try {
       const professionals = await this.http.get<Professional[]>(
-        `${environment.apiBaseUrl}/professionals`,
+        `${environment.apiBaseUrl}/Professionals`,
         { params: { specialtyId: specialtyId.toString() } }
       ).toPromise();
 
